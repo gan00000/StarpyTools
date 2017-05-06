@@ -24,7 +24,7 @@ def myJob():
 if __name__ == '__main__':
 
     sched = BlockingScheduler()
-    sched.add_job(myJob, 'cron', hour='7,9,11,13,15,17,19,21,23', minute=59)
+    sched.add_job(myJob, 'cron', hour='7,9,11,13,15,17,19,21,23', minute=57)
     try:
         sched.start()
     except:

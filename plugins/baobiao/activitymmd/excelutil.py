@@ -50,7 +50,7 @@ def readExcel(file_name):
 
     activitybean_list = []
 
-    table = data.sheets()[2]
+    table = data.sheets()[0]
 
     # for table in tables:
 

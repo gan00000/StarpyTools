@@ -287,19 +287,38 @@ def getAllPay(session,all_config_temp):
 
 
 def sendActivityWuPin(activity_list):
+    from bs4 import BeautifulSoup
     url='http://47.89.21.166/master/duoluotaitanGM/mail/singlemail'
     send_header = {'Referer': 'http://47.89.21.166/master/duoluotaitanGM/'}
     login_page, m_seeion = session_login()
     sendres = m_seeion.get(url,headers=send_header)
-    sendres_str = sendres.text
+
+    add_page_header = {'Referer': 'http://47.89.21.166/master/duoluotaitanGM/mail/singlemail'}
+    add_page = m_seeion.get('http://47.89.21.166/master/duoluotaitanGM/mail/singlemail/add', headers=add_page_header)
+    sendres_str = add_page.text
     print sendres_str
 
+    soup = BeautifulSoup(sendres_str,'html.parser')
+
+    server_ip_list = soup.find_all(name='option',value=re.compile('http://'))
+    print server_ip_list
+    server_ip = {}
+    for ipitem in server_ip_list:
+        string_text = ipitem.string
+        ip = ipitem.get('value')
+        print string_text
+        string_text = string_text[0:2].replace('-','')
+        print string_text
+        server_ip[string_text] = ip
+
+    print server_ip
     if sendres is not None:
         for activity in activity_list:
             giftList = activity.giftList
             if giftList is not None:
                 for g in giftList:
-                    area_host = get_area_host(activity)
+                    # area_host = get_area_host(activity)
+                    area_host = server_ip.get(activity.sever_code)
                     send_activity_value = {
                     'row[platform]': '1',
                     'row[area_host]': area_host,#伺服器
@@ -320,42 +339,42 @@ def sendActivityWuPin(activity_list):
                             print 'ok'
 
 
-def get_area_host(activity):
-    server_code = activity.sever_code
-    area_host = 'http://47.89.16.15:51050/'
-    if server_code == '1':
-        area_host = 'http://47.89.16.15:51050/'
-    elif server_code == '2':
-        area_host = 'http://47.89.16.15:51050/'
-    elif server_code == '3':
-        area_host = 'http://47.52.21.158:51050/'
-    elif server_code == '4':
-        area_host = 'http://47.52.24.110:51050/'
-    elif server_code == '5':
-        area_host = 'http://47.90.124.240:51050/'
-    elif server_code == '6':
-        area_host = 'http://47.52.17.109:51050/'
-    elif server_code == '7':
-        area_host = 'http://47.89.23.71:51050/'
-    elif server_code == '8':
-        area_host = 'http://47.89.23.71:51051/'
-    elif server_code == '9':
-        area_host = 'http://47.89.23.71:51052/'
-    elif server_code == '10':
-        area_host = 'http://47.90.126.21:51050/'
-    elif server_code == '11':
-        area_host = 'http://47.90.126.21:51051/'
-    elif server_code == '12':
-        area_host = 'http://47.89.16.15:51051/'
-    elif server_code == '13':
-        area_host = 'http://47.52.21.158:51051/'
-    elif server_code == '14':
-        area_host = 'http://47.52.24.110:51051/'
-    elif server_code == '15':
-        area_host = 'http://47.90.124.240:51051/'
-    elif server_code == '16':
-        area_host = 'http://47.52.17.109:51051/'
-    return area_host
+# def get_area_host(activity):
+#     server_code = activity.sever_code
+#     area_host = 'http://47.89.16.15:51050/'
+#     if server_code == '1':
+#         area_host = 'http://47.89.16.15:51050/'
+#     elif server_code == '2':
+#         area_host = 'http://47.89.16.15:51050/'
+#     elif server_code == '3':
+#         area_host = 'http://47.52.21.158:51050/'
+#     elif server_code == '4':
+#         area_host = 'http://47.52.24.110:51050/'
+#     elif server_code == '5':
+#         area_host = 'http://47.90.124.240:51050/'
+#     elif server_code == '6':
+#         area_host = 'http://47.52.17.109:51050/'
+#     elif server_code == '7':
+#         area_host = 'http://47.89.23.71:51050/'
+#     elif server_code == '8':
+#         area_host = 'http://47.89.23.71:51051/'
+#     elif server_code == '9':
+#         area_host = 'http://47.89.23.71:51052/'
+#     elif server_code == '10':
+#         area_host = 'http://47.90.126.21:51050/'
+#     elif server_code == '11':
+#         area_host = 'http://47.90.126.21:51051/'
+#     elif server_code == '12':
+#         area_host = 'http://47.89.16.15:51051/'
+#     elif server_code == '13':
+#         area_host = 'http://47.52.21.158:51051/'
+#     elif server_code == '14':
+#         area_host = 'http://47.52.24.110:51051/'
+#     elif server_code == '15':
+#         area_host = 'http://47.90.124.240:51051/'
+#     elif server_code == '16':
+#         area_host = 'http://47.52.17.109:51051/'
+#     return area_host
 
 
 def getGameAllInfo():
