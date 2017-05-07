@@ -3,6 +3,7 @@ import xlrd
 import collections
 from activitybean import *
 from gitinfo import *
+import os
 
 def writeexcel(file_name, t_list):
     #打开excel
@@ -42,6 +43,11 @@ def writeexcel(file_name, t_list):
         row = row + 1
 
 def readExcel(file_name):
+
+    if os.path.exists(file_name) is not True:
+        print 'excel不存在'
+        return
+
     # 打开excel
     data = xlrd.open_workbook(file_name,"rb")  # 注意这里的workbook首字母是小写
     # 查看文件中包含sheet的名称
