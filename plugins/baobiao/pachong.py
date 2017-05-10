@@ -423,14 +423,17 @@ def getGameAllInfo():
             pass
         else:
             total_dau = total_dau + int(als.login_roles)
+
         if als.current_online == '':
             pass
         else:
             total_current_online = total_current_online + int(als.current_online)
+
         if als.register_roles == '':
             pass
         else:
             total_register = total_register + int(als.register_roles)
+
         if int(als.sever_id) > 10:
             game_info_s10 = game_info_s10 + "S " + als.sever_id + "       " + als.login_roles + "         " + als.current_online + '            ' + als.register_roles + '              ' + str( als.pays) + '\n'
         else:

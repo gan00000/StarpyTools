@@ -23,12 +23,11 @@ def myJob():
 
 if __name__ == '__main__':
 
-
     sched = BlockingScheduler()
-    sched.add_job(myJob, 'cron', hour='7,9,11,13,15,17,19,21,23', minute=57)
+    sched.add_job(myJob, 'cron', hour='7,9,11,13,15,17,18,19,20,21,22,23', minute=57)
     try:
-        myJob()
-        # sched.start()
+        # myJob()
+        sched.start()
     except:
         pass
 
