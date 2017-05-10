@@ -145,6 +145,7 @@ def realtime(session,all_config):
             onlinecfg.currentonline = str(json_cell.get('currentonline'))
             onlinecfg_list.append(onlinecfg)
             set_all_config_online(all_config,onlinecfg)
+            print onlinecfg.server_id + " 实时在线:" + onlinecfg.currentonline
 
     return onlinecfg_list
 
