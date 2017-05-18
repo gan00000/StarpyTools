@@ -92,8 +92,9 @@ def bmdzzbaoshu():
             baoshu_info = '区服:%s  新增角色数:%s  角色登录数:%s  新增付费角色数:%s  新增收入:%s  新增付费比:%s  新增ARPPU:%s  全部付费角色数:%s  全部收入:%s  ARPPU:%s' % (
             s.serverName, s.newRole, s.roleLogin, s.newPayRole, s.newPay, s.newPayRate, s.newARPPU, s.totalRolePay,
             s.totalPay, s.arppu)
-            print baoshu_info
 
+    baoshu_info = '把妹大作战数据:\n' + baoshu_info
+    print baoshu_info
     return baoshu_info
 
 
