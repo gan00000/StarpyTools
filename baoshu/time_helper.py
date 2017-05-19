@@ -71,6 +71,11 @@ def current_timestamp():
     local_timestamp_now = datetime_to_timestamp(local_datetime_now)
     return local_timestamp_now
 
+def get_current_time():
+    # print time.time()
+    t = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+    return t
+
 if __name__ == '__main__':
 
     time_str = '2016-02-25 20:21:04.242000'
