@@ -147,7 +147,7 @@ def bmdzzbaoshu():
             else:
                 if ss.totalPay and ss.newRole:
 
-                    ltv = ltv + '区服:%s lvt: %s' % (ss.serverName, str(round(float(ss.totalPay) / float(ss.newRole),2))) + '\n'
+                    ltv = ltv + '区服:%s LTV: %s' % (ss.serverName, str(round(float(ss.totalPay) / float(ss.newRole),2))) + '\n'
 
     print ltv
     baoshu_info = baoshu_info + '\n\n' + ltv
