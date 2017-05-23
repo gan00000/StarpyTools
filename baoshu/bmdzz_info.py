@@ -15,3 +15,4 @@ class bmdzzinfo:
         self.totalRolePay = ''
         self.totalPay = ''
         self.arppu = ''
+        self.ltv = ''

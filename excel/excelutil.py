@@ -8,7 +8,8 @@ import xlwt
 
 def set_style(name, height, bold=False):
 
-    style = xlwt.XFStyle()  # 初始化样式
+    # style = xlwt.XFStyle()  # 初始化样式
+    style = xlwt.easyxf('align: wrap on,vert centre, horiz centre;')
 
     font = xlwt.Font()  # 为样式创建字体
     font.name = name  # 'Times New Roman'
@@ -17,6 +18,7 @@ def set_style(name, height, bold=False):
     font.height = height
 
     # borders= xlwt.Borders()
+
     # borders.left= 6
     # borders.right= 6
     # borders.top= 6
@@ -27,6 +29,10 @@ def set_style(name, height, bold=False):
 
     return style
 
+
+def create_wrap_centre():
+    style = xlwt.easyxf('align: wrap on,vert centre, horiz centre;')
+    return style
 
 # 写excel
 def write_excel():
@@ -39,11 +45,10 @@ def write_excel():
     '''
     sheet1 = f.add_sheet(u'sheet1', cell_overwrite_ok=True)  # 创建sheet
     row0 = [u'业务', u'状态', u'北京', u'上海', u'广州', u'深圳', u'状态小计', u'合计']
-    column0 = [u'机票', u'船票', u'火车票', u'汽车票', u'其它']
-    status = [u'预订', u'出票', u'退票', u'业务小计']
 
     # 生成第一行
     for i in range(0, len(row0)):
+        sheet1.col(i).width = 0x0d00 * 2
         sheet1.write(0, i, row0[i], set_style('Times New Roman', 220, True))
 
     # # 生成第一列和最后一列(合并4行)
@@ -63,7 +68,7 @@ def write_excel():
     #         sheet1.write(j + i + 1, 1, status[j])
     #     i += 4
 
-    f.save('/Users/gan/Downloads/123s.xlsx')  # 保存文件
+    f.save('F:\\123s.xls')  # 保存文件
 
 
 if __name__ == '__main__':

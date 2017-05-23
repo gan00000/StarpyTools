@@ -16,6 +16,7 @@ import simplejson as json
 from online_config import *
 import datetime
 import collections
+from excel.excelutil import *
 
 def product_cookies(msession):
     cookies_str = ''
@@ -441,31 +442,11 @@ def getGameAllInfo():
 
     game_info_huizong = 'DAU汇总:' + str(total_dau)  + "       在线人数汇总:" + str(total_current_online) + \
     '       注册汇总:' + str(total_register) + "\nMYCARD:" + all_config.others_pay + "      储值汇总:" + all_config.all_pay + "      储值人数:" + all_config.pay_persions + '\n新增付费率:' + all_config.new_pay_rate + '       活跃付费率:' + all_config.active_pay_rate + '        ARPPU:' + all_config.pay_arpu
-    # print game_info
-    # print game_info_s10
-    # game_info_len = len(game_info)
-    # game_info_1 = game_info[0:game_info_len/2]
-    # game_info_2 = game_info[game_info_len/2:game_info_len]
-    # os.system('qq send group 上海星彼网络科技 "' + game_info + '"')
-    # time.sleep(2)
-    # os.system('qq send group 上海星彼网络科技 "' + game_info_s10 + '"')
-    # time.sleep(2)
-    # os.system('qq send group 上海星彼网络科技 "' + game_info_huizong + '"')
-    # print all_config.toStr()
 
-    # 获取每个服务器的LTV
-    # for v in all_config.sever_list:
-    #     print 'sever_list:' + v
-    #     m = int(v)
-    #     if m > 9:
-    #         payment_ltv(session, all_config,v)
-    #
-    #         if len(all_config.server_info_list) >= m:
-    #             print 'ltv:' + str(all_config.server_info_list[m - 1].ltv_pay)
     lvt_str = 'LTV数据如下：\n'
     for s in all_config.server_info_list:
         m = int(s.sever_id)
-        if m > 9 :
+        if m > 12 :
             payment_ltv(session, all_config, s.sever_id)
             # print 'ltv:' + str(s.ltv_pay)
             if s.ltv_pay > 0 and s.allRegister > 0:
@@ -503,3 +484,111 @@ def session_login():
     session.cookies.save()
     return login_page, session
 
+
+def getGameDataInfoBean():
+
+    login_page, session = session_login()
+
+    # //根据每个服获取dua和在线
+    all_config = AllConfig()
+
+    if "area_selected_id=" in login_page.text:
+        re_server_list = re.compile('area_selected_id=[\w]{0,5}')  # 判断是否为中文的正则表达式
+        server_list = re_server_list.findall(login_page.text)  # 使用正则表达获取中文
+        # print str
+        if server_list:
+
+            for s in server_list:
+                server_list_split = s.split('=')
+                # print server_list_split[1]
+                all_config.sever_list.append(server_list_split[1])
+            # print all_config.server_info_list
+
+    # 获取每个服务器的在线，dau
+    for v in all_config.sever_list:
+        print v
+        serverinfotemp = getServerInfo(session,v)
+        if serverinfotemp is not None:
+            all_config.server_info_list.append(serverinfotemp)
+
+
+    #获取每个服务器的实时在线
+    realtime(session,all_config)
+    # print onlinecfg
+
+    payment(session, all_config)
+    getAllPay(session, all_config)
+
+    f = xlwt.Workbook()  # 创建工作簿
+
+    '''
+    创建第一个sheet:
+      sheet1
+    '''
+    sheet1 = f.add_sheet(u'sheet1', cell_overwrite_ok=True)  # 创建sheet
+
+    total_dau = 0
+    total_current_online = 0
+    total_register = 0
+    # 生成第一行
+    row0_title = [u'伺服器', u'DAU ', u'在线人数CCU', u'注册数用户数', u'ios/google储值', u'累计储值总额', u'累计注册', u'LTV(USD)']
+    for i in range(0, len(row0_title)):
+        # sheet1.col(i).width = 0x0d00
+        sheet1.write(0, i, row0_title[i], set_style('Times New Roman', 220, True))
+
+    style = create_wrap_centre()
+    s_len = len(all_config.server_info_list)
+    for j in range(s_len):
+        als = all_config.server_info_list[j]
+        if als.login_roles == '':
+            pass
+        else:
+            total_dau = total_dau + int(als.login_roles)
+
+        if als.current_online == '':
+            pass
+        else:
+            total_current_online = total_current_online + int(als.current_online)
+
+        if als.register_roles == '':
+            pass
+        else:
+            total_register = total_register + int(als.register_roles)
+
+        s_total_pay = '\\'
+        s_total_register = '\\'
+        s_ltv = '\\'
+
+        m = int(als.sever_id)
+        if m > 12:
+            payment_ltv(session, all_config, als.sever_id)
+            # print 'ltv:' + str(s.ltv_pay)
+            if als.ltv_pay > 0 and als.allRegister > 0:
+                # lvt_str = lvt_str + "S" + als.sever_id + " : 累计储值总额: " + str(als.ltv_pay) + "       累计注册: " + str(
+                #     s.allRegister) + "     LTV(USD)  : " + str(round(s.ltv_pay / s.allRegister, 2)) + "\n"
+                s_total_pay = str(als.ltv_pay)
+                s_total_register = str(als.allRegister)
+                s_ltv = str(round(als.ltv_pay / als.allRegister, 2))
+
+        row0_info = [als.sever_id, als.login_roles, als.current_online, als.register_roles, str(als.pays), s_total_pay, s_total_register, s_ltv]
+        for i in range(0, len(row0_info)):
+            sheet1.write(j+1, i, row0_info[i],style)
+
+    # game_info_huizong = 'DAU汇总:' + str(total_dau) + "       在线人数汇总:" + str(total_current_online) + \
+    #                     '       注册汇总:' + str(
+    #     total_register) + "\nMYCARD:" + all_config.others_pay + "      储值汇总:" + all_config.all_pay + "      储值人数:" + all_config.pay_persions + '\n新增付费率:' + all_config.new_pay_rate + '       活跃付费率:' + all_config.active_pay_rate + '        ARPPU:' + all_config.pay_arpu
+
+    row0_huizong = [u'汇总', str(total_dau), str(total_current_online), str(total_register), u"MYCARD:" + all_config.others_pay + '  ' + u"储值汇总:" + all_config.all_pay]
+    aaa = [u'新增付费率:' + all_config.new_pay_rate, u'活跃付费率:' + all_config.active_pay_rate, u'ARPPU:' + all_config.pay_arpu]
+
+    for i in range(0, len(row0_huizong)):
+        sheet1.write(j + 2, i, row0_huizong[i], style)
+    for i in range(0, len(aaa)):
+        sheet1.write(j + 3, i, aaa[i], style)
+    f.save('F:\\123s.xls')  # 保存文件
+
+    return all_config
+
+
+if __name__ == '__main__':
+    getGameDataInfoBean()

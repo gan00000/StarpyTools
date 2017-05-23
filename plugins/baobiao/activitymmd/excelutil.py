@@ -42,7 +42,7 @@ def writeexcel(file_name, t_list):
         table.cell(row,0).value = v # 'lixiaoluo'
         row = row + 1
 
-def readExcel(file_name):
+def readExcel(file_name,sheet):
 
     if os.path.exists(file_name) is not True:
         print 'excel不存在'
@@ -56,7 +56,7 @@ def readExcel(file_name):
 
     activitybean_list = []
 
-    table = data.sheets()[0]
+    table = data.sheets()[sheet]
 
     # for table in tables:
 
