@@ -1,5 +1,7 @@
 #-*- coding: UTF-8 -*-
 import sys
+import types
+
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -143,7 +145,19 @@ def realtime(session,all_config):
         if json_cell is not None:
             onlinecfg = online_config()
             onlinecfg.server_id = str(json_cell.get('id'))
-            onlinecfg.currentonline = str(json_cell.get('currentonline'))
+            currentOnLine = json_cell.get('currentonline');
+            aa = "<label style='color:#999999'>"
+            if type(currentOnLine) is types.IntType:
+                entonline = str(currentOnLine)
+
+            else:
+                if aa in currentOnLine:
+                    onlineTemp = currentOnLine.replace(aa, '').replace("</label>", '')
+                    entonline = onlineTemp
+                else:
+                    entonline = currentOnLine
+
+            onlinecfg.currentonline = entonline
             onlinecfg_list.append(onlinecfg)
             set_all_config_online(all_config,onlinecfg)
             print onlinecfg.server_id + " 实时在线:" + onlinecfg.currentonline
@@ -531,11 +545,18 @@ def getGameDataInfoBean():
     total_current_online = 0
     total_register = 0
     # 生成第一行
+
+    role_game_title = [u'别惹萌萌哒 %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time())))]
+    sheet1.write_merge(0, 0, 0, 7)
+    write_row = 0
+    sheet1.write(write_row, 0, role_game_title,  set_style('Times New Roman', 220, True))
+    write_row = write_row + 1
     row0_title = [u'伺服器', u'DAU ', u'在线人数CCU', u'注册数用户数', u'ios/google储值', u'累计储值总额', u'累计注册', u'LTV(USD)']
     for i in range(0, len(row0_title)):
         # sheet1.col(i).width = 0x0d00
-        sheet1.write(0, i, row0_title[i], set_style('Times New Roman', 220, True))
+        sheet1.write(write_row, i, row0_title[i], set_style('Times New Roman', 220, True))
 
+    write_row = write_row + 1
     style = create_wrap_centre()
     s_len = len(all_config.server_info_list)
     for j in range(s_len):
@@ -572,20 +593,23 @@ def getGameDataInfoBean():
 
         row0_info = [als.sever_id, als.login_roles, als.current_online, als.register_roles, str(als.pays), s_total_pay, s_total_register, s_ltv]
         for i in range(0, len(row0_info)):
-            sheet1.write(j+1, i, row0_info[i],style)
+            sheet1.write(write_row, i, row0_info[i], style)
+        write_row = write_row + 1
 
     # game_info_huizong = 'DAU汇总:' + str(total_dau) + "       在线人数汇总:" + str(total_current_online) + \
     #                     '       注册汇总:' + str(
     #     total_register) + "\nMYCARD:" + all_config.others_pay + "      储值汇总:" + all_config.all_pay + "      储值人数:" + all_config.pay_persions + '\n新增付费率:' + all_config.new_pay_rate + '       活跃付费率:' + all_config.active_pay_rate + '        ARPPU:' + all_config.pay_arpu
 
-    row0_huizong = [u'汇总', str(total_dau), str(total_current_online), str(total_register), u"MYCARD:" + all_config.others_pay + '  ' + u"储值汇总:" + all_config.all_pay]
+    row_title_huizong = [u'汇总', str(total_dau), str(total_current_online), str(total_register), u"MYCARD:" + all_config.others_pay + '  ' + u"储值汇总:" + all_config.all_pay]
     aaa = [u'新增付费率:' + all_config.new_pay_rate, u'活跃付费率:' + all_config.active_pay_rate, u'ARPPU:' + all_config.pay_arpu]
 
-    for i in range(0, len(row0_huizong)):
-        sheet1.write(j + 2, i, row0_huizong[i], style)
+    for i in range(0, len(row_title_huizong)):
+        sheet1.write(write_row, i, row_title_huizong[i], style)
+    write_row = write_row + 1
     for i in range(0, len(aaa)):
-        sheet1.write(j + 3, i, aaa[i], style)
-    f.save('F:\\123s.xls')  # 保存文件
+        sheet1.write(write_row, i, aaa[i], style)
+    write_row = write_row + 1
+    f.save('E:\\jingling\\brmmd_baoshu.xls')  # 保存文件
 
     return all_config
 

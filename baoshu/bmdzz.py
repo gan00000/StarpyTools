@@ -165,17 +165,26 @@ def createXls(login_session, all_info):
                 pass
             else:
                 if ss.totalPay and ss.newRole:
+                    print 'totalPay:' + ss.totalPay + '---newRole:' + ss.newRole
                     ss.ltv = str(round(float(ss.totalPay) / float(ss.newRole), 2))
                     # ltv = ltv + '区服:%s LTV: %s' % (ss.serverName, str(round(float(ss.totalPay) / float(ss.newRole),2))) + '\n'
+
 
     title = [u'区服',u'新增角色数',u'角色登录数',u'新增付费角色数',u'新增收入',u'新增付费比',u'新增ARPPU',u'全部付费角色数',u'全部收入',u'ARPPU',u'LTV']
     excel = xlwt.Workbook()  # 创建工作簿
     sheet1 = excel.add_sheet(u'sheet1', cell_overwrite_ok=True)  # 创建sheet
-    for i in range(0, len(title)):
-        sheet1.write(0, i, title[i], set_style('Times New Roman', 220, True))
 
+    role_game_title = [u'把妹大作战 %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time())))]
+    sheet1.write_merge(0, 0, 0, 10)
+    write_row = 0
+    sheet1.write(write_row, 0, role_game_title, set_style('Times New Roman', 220, True))
+    write_row = write_row + 1
+
+    for i in range(0, len(title)):
+        sheet1.write(write_row, i, title[i], set_style('Times New Roman', 220, True))
+    write_row = write_row + 1
     style = create_wrap_centre()
-    row = 1
+
     for s in all_info:
         if s.serverName is None or s.serverName.strip() == '狂人传说':
             pass
@@ -187,9 +196,9 @@ def createXls(login_session, all_info):
                     content.append(ss.ltv)
 
             for i in range(0, len(content)):
-                sheet1.write(row, i, content[i], style)
-            row = row + 1
-    excel.save('F:\\bmdzz_baoshu.xls')  # 保存文件
+                sheet1.write(write_row, i, content[i], style)
+            write_row = write_row + 1
+    excel.save('E:\\jingling\\bmdzz_baoshu.xls')  # 保存文件
 
 if __name__ == '__main__':
 

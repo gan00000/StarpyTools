@@ -67,8 +67,8 @@ def write_excel():
     #     for j in range(0, len(status)):
     #         sheet1.write(j + i + 1, 1, status[j])
     #     i += 4
-
-    f.save('F:\\123s.xls')  # 保存文件
+    sheet1.write_merge(2, 2, 0, 7)
+    f.save('F:\\123saaa.xls')  # 保存文件
 
 
 if __name__ == '__main__':

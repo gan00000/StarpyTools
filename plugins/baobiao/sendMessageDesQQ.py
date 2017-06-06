@@ -25,6 +25,12 @@ def myJob():
 
         getGameDataInfoBean()
         bmdzzbaoshu()
+        path_m = 'E:\\pachongmsg.txt'
+        if os.path.exists(path_m):
+            f_f = open(path_m, 'w')
+            t = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+            f_f.write(t)
+            f_f.close()
     except:
         pass
 
@@ -34,7 +40,7 @@ def testJob():
 if __name__ == '__main__':
 
     sched = BlockingScheduler()
-    sched.add_job(myJob, 'cron', hour='0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23', minute='56')
+    sched.add_job(myJob, 'cron', hour='0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23', minute='58')
     # sched.add_job(myJob, 'interval', hours=1)
     # sched.add_job(myJob, 'interval', hours=1,start_date=0)
     try:
