@@ -185,10 +185,29 @@ def createXls(login_session, all_info):
     write_row = write_row + 1
     style = create_wrap_centre()
 
+
+    allNewRole = 0
+    roleLogin = 0
+    newPayRole = 0
+    newIncome = 0
+    newArppu = 0
+    allPayRole = 0
+    allIncome = 0
+    allArppu = 0
+
     for s in all_info:
         if s.serverName is None or s.serverName.strip() == '狂人传说':
             pass
         else:
+
+            allNewRole = allNewRole + int(s.newRole)
+            roleLogin = roleLogin + int( s.roleLogin)
+            newPayRole = newPayRole + int(s.newPayRole)
+            newIncome = newIncome + float(s.newPay)
+           # newArppu = newArppu + float(s.newARPPU)
+            allPayRole = allPayRole + float(s.totalRolePay)
+            allIncome = allIncome + float(s.totalPay)
+            allArppu = allArppu + float(s.arppu)
             content = [s.serverName, s.newRole, s.roleLogin, s.newPayRole, s.newPay, s.newPayRate, s.newARPPU, s.totalRolePay, s.totalPay, s.arppu]
 
             for ss in all_server_info:#拼接ltv
@@ -198,6 +217,10 @@ def createXls(login_session, all_info):
             for i in range(0, len(content)):
                 sheet1.write(write_row, i, content[i], style)
             write_row = write_row + 1
+
+    huizong = [u'汇总',allNewRole, roleLogin, newPayRole,newIncome,'-','-',allPayRole,allIncome,allArppu,'']
+    for i in range(0, len(huizong)):
+        sheet1.write(write_row, i,huizong[i] , style)
     excel.save('E:\\jingling\\bmdzz_baoshu.xls')  # 保存文件
 
 if __name__ == '__main__':

@@ -187,6 +187,7 @@ def set_all_config_online(all_config,onlinecfg):
 # flexigrid?_=1493111107475
 
 def payment(session,all_config):
+    print '充值订单详情'
     _header = {'Referer': 'http://47.89.21.166/master/duoluotaitanGM/index'}
     session.get("http://47.89.21.166/master/duoluotaitanGM/dbvip/payment",headers=_header)
     payment_params = {
@@ -221,6 +222,7 @@ def payment(session,all_config):
 
 
 def payment_ltv(session,all_config,serverid):
+    print 'ltv : ' + serverid
     _header = {'Referer': 'http://47.89.21.166/master/duoluotaitanGM/dbvip/payment'}
     session.get("http://47.89.21.166/master/duoluotaitanGM/dbvip/payment",headers=_header)
 
@@ -281,7 +283,7 @@ def sum_pay(all_config, json_cell, serverid):
 
 
 def getAllPay(session,all_config_temp):
-
+    print '玩家充值数据'
     url = 'http://47.89.21.166/master/duoluotaitanGM/businessdata/businesschargedata'
     all_res = session.get(url).text
     # print all_res
@@ -529,7 +531,6 @@ def getGameDataInfoBean():
     #获取每个服务器的实时在线
     realtime(session,all_config)
     # print onlinecfg
-
     payment(session, all_config)
     getAllPay(session, all_config)
 

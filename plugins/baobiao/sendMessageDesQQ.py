@@ -31,8 +31,10 @@ def myJob():
             t = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
             f_f.write(t)
             f_f.close()
-    except:
+    except Exception, e:
+        print 'error message:\t %s', e.message
         pass
+
 
 def testJob():
     print 'test job'
