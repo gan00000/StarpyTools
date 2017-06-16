@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+
+from baoshu import hajl
 from plugins.baobiao.pachong import *
 from apscheduler.schedulers.background import BlockingScheduler
 from baoshu.bmdzz import *
@@ -23,8 +25,20 @@ def myJob():
         #     f_f.write(s)
         #     f_f.close()
 
-        getGameDataInfoBean()
-        bmdzzbaoshu()
+        try:
+            getGameDataInfoBean()
+        except:
+            pass
+        try:
+            bmdzzbaoshu()
+        except:
+            pass
+
+        try:
+            hajl.requestData()
+        except:
+            pass
+
         path_m = 'E:\\pachongmsg.txt'
         if os.path.exists(path_m):
             f_f = open(path_m, 'w')

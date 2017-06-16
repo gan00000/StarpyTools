@@ -1,14 +1,15 @@
 #-*- coding: UTF-8 -*-
+import sys
 import time
+import types
 
 from bs4 import BeautifulSoup
 
 from baoshu.AccountLogin import Login
 from baoshu.bmdzz_info import bmdzzinfo
 from baoshu.time_helper import current_timestamp, get_current_time
-
-import sys
 from excel.excelutil import *
+
 #解决 UnicodeDecodeError: 'ascii' codec can't decode 报错
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -201,13 +202,19 @@ def createXls(login_session, all_info):
         else:
 
             allNewRole = allNewRole + int(s.newRole)
-            roleLogin = roleLogin + int( s.roleLogin)
+            roleLogin = roleLogin + int(s.roleLogin)
             newPayRole = newPayRole + int(s.newPayRole)
             newIncome = newIncome + float(s.newPay)
            # newArppu = newArppu + float(s.newARPPU)
             allPayRole = allPayRole + float(s.totalRolePay)
             allIncome = allIncome + float(s.totalPay)
-            allArppu = allArppu + float(s.arppu)
+            try:
+                if type(s.arppu) is types.StringType:
+                    pass
+                else:
+                    allArppu = allArppu + float(s.arppu)
+            except:
+                pass
             content = [s.serverName, s.newRole, s.roleLogin, s.newPayRole, s.newPay, s.newPayRate, s.newARPPU, s.totalRolePay, s.totalPay, s.arppu]
 
             for ss in all_server_info:#拼接ltv

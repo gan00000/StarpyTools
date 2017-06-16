@@ -40,6 +40,8 @@ class Login:
             print("Cookie 未能加载")
 
         urllib2.urlopen(loginPageUrl)
+        # mainPage = session.get(loginPageUrl)
+        # print mainPage.text
         #
         # url = "http://47.89.21.166/master/duoluotaitanGM/index/login"
         # values = {'username': 'tw001',
