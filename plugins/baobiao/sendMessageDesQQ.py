@@ -27,17 +27,18 @@ def myJob():
 
         try:
             getGameDataInfoBean()
-        except:
-            pass
+        except Exception, e:
+            print 'error message:', e.message
+
         try:
             bmdzzbaoshu()
-        except:
-            pass
+        except Exception, e:
+            print 'error message:', e.message
 
         try:
             hajl.requestData()
-        except:
-            pass
+        except Exception, e:
+            print 'error message:', e.message
 
         path_m = 'E:\\pachongmsg.txt'
         if os.path.exists(path_m):
@@ -46,8 +47,8 @@ def myJob():
             f_f.write(t)
             f_f.close()
     except Exception, e:
-        print 'error message:\t %s', e.message
-        pass
+        print 'error message:', e.message
+
 
 
 def testJob():
@@ -56,7 +57,7 @@ def testJob():
 if __name__ == '__main__':
 
     sched = BlockingScheduler()
-    sched.add_job(myJob, 'cron', hour='0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23', minute='58')
+    sched.add_job(myJob, 'cron', hour='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23', minute='58')
     # sched.add_job(myJob, 'interval', hours=1)
     # sched.add_job(myJob, 'interval', hours=1,start_date=0)
     try:

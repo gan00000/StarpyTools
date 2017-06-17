@@ -18,7 +18,6 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 def requestData():
     mLogin = Login()
-    userlogin = Login2()
     loginPage = 'http://jllrcsss-tw.starb168.com/gameManager/index.jsp'
     loginPostUrl = 'http://jllrcsss-tw.starb168.com/gameManager/login.do'
     postVaule = {
@@ -39,58 +38,96 @@ def requestData():
 
     menupage = login_session.get('http://jllrcsss-tw.starb168.com/gameManager/menu.jsp',headers= headers)
     # print menupage.text
-
+    #每个接口都需要 带这个 头header才能访问通过（奇怪）
     listSmsg = showDailyReport(login_session,headers)
 
-    writeExcel(listSmsg)
-
-
-def writeExcel(listSmsg):
-
-    title = [u'区服', u'新增账号', u'角色登录数', u'新增付费角色数', u'新增收入', u'新增付费比', u'新增ARPPU', u'全部付费角色数', u'当日全部收入', u'付费率', u'ARPPU',
-             u'LTV']
-    excel = xlwt.Workbook()  # 创建工作簿
-    sheet1 = excel.add_sheet(u'sheet1', cell_overwrite_ok=True)  # 创建sheet
-    role_game_title = [u'精灵猎人 %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time())))]
-    sheet1.write_merge(0, 0, 0, len(title))
-    write_row = 0
-    sheet1.write(write_row, 0, role_game_title, set_style('Times New Roman', 220, True))
-    write_row = write_row + 1
-
-    for i in range(0, len(title)):
-        sheet1.write(write_row, i, title[i], set_style('Times New Roman', 220, True))
-    write_row = write_row + 1
-    style = create_wrap_centre()
-    for s in listSmsg:
-        content = [s.serverName, s.newRole, s.roleLogin, s.newPayRole, s.newPay, s.newPayRate, s.newARPPU,
-                   s.totalRolePay, s.totalPay,s.payPercent, s.arppu,s.ltv]
-        for i in range(0, len(content)):
-            sheet1.write(write_row, i, content[i], style)
-        write_row = write_row + 1
-
-    excel.save('E:\\jingling\\hajl_baoshu.xls')  # 保存文件
-
+    writeExcelForGameInfo('E:\\jingling\\hajl_baoshu.xls',u'精灵猎人 %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))),listSmsg)
 
 
 def showDailyReport(loginSession,headers):
     url = 'http://jllrcsss-tw.starb168.com/gameManager/view/pay/showDailyReport.jsp'
     loginSession.get(url,headers = headers)
 
-    showDailyReportDo = 'http://jllrcsss-tw.starb168.com/gameManager/pay/showDailyReport.do'
-
     serverIds = getServers(headers, loginSession)#获取所有伺服器id
-    listSmsg = []
+    allServersCurrentDayMsg = []
+    startTime = get_current_time() + ' 00:00:00'
     if serverIds:
         print serverIds
-        for a in serverIds:
-            if a == 1000:
-                pass
+        for sId in serverIds:
+            print 'serverId:' + str(sId)
+            #获取当天的服信息
+            currentDaySmsgArray = getServerMsg(headers, loginSession, sId, startTime)  # 获取当天该伺服器信息
+            if currentDaySmsgArray and len(currentDaySmsgArray) == 1:
+                currentDaySmsg = currentDaySmsgArray[0]
+                allServersCurrentDayMsg.append(currentDaySmsg)
             else:
-                print 'serverId:' + str(a)
-                sMsg = getServerMsg(headers, loginSession, showDailyReportDo, a) #获取所有伺服器信息
-                print str(sMsg.totalPay)
-                listSmsg.append(sMsg)
-        return listSmsg
+                break
+
+            try:
+                allDayServerInfoArr = getServerMsg(headers, loginSession, sId, '2017-06-15 00:00:00')  # 获取该服所有天数信息
+                if allDayServerInfoArr:
+                    allReg = 0
+                    for s in allDayServerInfoArr:
+                        allReg = allReg + int(s.newRole)
+                    currentDaySmsg.allDayReg = allReg
+
+                allDayPay = getPay(headers, loginSession,sId, '2017-06-15 00:00:00')
+                currentDaySmsg.allDayPay = allDayPay
+
+                currentDaySmsg.ltv = str(round(allDayPay/allReg,2))
+            except:
+                pass
+
+
+        allServersCurrentDayMsg = getRetimeOnline(headers, loginSession,serverIds,allServersCurrentDayMsg)
+        return allServersCurrentDayMsg
+
+def getPay(headers, loginSession, serverIds,startTime):
+    payUrl = 'http://jllrcsss-tw.starb168.com/gameManager/pay/sts.do'
+    values = {
+        'nowPage': '1',
+        'serverId': serverIds,
+        'gmpay': 1,
+        'type': 1,
+        'startTime': startTime,
+        'endTime': get_current_time2(),
+        'page': '1',
+        'rows': '20'
+    }
+    s = loginSession.post(payUrl, data=values, headers=headers)
+    payDatas = json.loads(s.text)
+    rowsData = payDatas.get('rows')
+    pays = 0
+    if rowsData:
+        for d in rowsData:
+            pays = pays + d.get('count')
+    return pays
+
+
+def getRetimeOnline(headers, loginSession, serverIds, listSmsg):
+    retimeUrl = 'http://jllrcsss-tw.starb168.com/gameManager/onlineST/inquire.do'
+    values = {
+        'nowPage': '1',
+        'serverId': ','.join(serverIds),
+        'page': '1',
+        'rows': '20'
+    }
+    s = loginSession.post(retimeUrl, data=values,headers=headers)
+    print s.text
+    retimeDatas = json.loads(s.text)
+    dataArray = retimeDatas.get('rows')
+    if dataArray:
+        for d in dataArray:
+            sId = d.get('serverId')
+            retimeOnlie_a = d.get('num')
+            if not retimeOnlie_a:
+                retimeOnlie_a = 0
+            for sMsg in listSmsg:
+                if sId == sMsg.serverName:
+                    sMsg.ccu = retimeOnlie_a
+    return listSmsg
+
+
 
 
 def getServers(headers, loginSession):
@@ -102,12 +139,16 @@ def getServers(headers, loginSession):
         serverIds = []
         for obj in serverList:
             serverId = obj.get('serverId')
-            serverIds.append(serverId)
+            if serverId == 1000:
+                pass
+            else:
+                serverIds.append(str(serverId))
     return serverIds
 
 
-def getServerMsg(headers, loginSession, showDailyReportDo,serverId):
-    startTime = get_current_time() + ' 00:00:00'
+def getServerMsg(headers, loginSession,serverId,startTime):
+    showDailyReportDo = 'http://jllrcsss-tw.starb168.com/gameManager/pay/showDailyReport.do'
+    # startTime = get_current_time() + ' 00:00:00'
     values = {
         'serverId': serverId,
         'startTime': startTime,
@@ -120,6 +161,7 @@ def getServerMsg(headers, loginSession, showDailyReportDo,serverId):
     if parsed_json:
         serverArry = parsed_json.get('rows')
         if serverArry:
+            sMsgArray = []
             for obj in serverArry:
                 platform = obj.get('platform')
                 if platform == '全平台':
@@ -141,8 +183,9 @@ def getServerMsg(headers, loginSession, showDailyReportDo,serverId):
                     sMsg.payPercent = payPercent
                     sMsg.serverName = serverId
                     sMsg.roleLogin = liveID
+                    sMsgArray.append(sMsg)
 
-                    return sMsg
+            return sMsgArray
     return None
 
 
