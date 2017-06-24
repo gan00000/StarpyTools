@@ -54,18 +54,6 @@ def writeExcelForGameInfo(path, title_title, listSmsg):
     write_row = write_row + 1
     style = create_wrap_centre()
 
-    allNewRole = 0
-    ccuAll = 0
-    roleLoginALL = 0
-    newPayRole = 0
-    newIncome = 0
-    newArppu = 0
-    allPayRole = 0
-    allIncome = 0
-    allArppu = 0
-    allLTV = 0
-    payPercentAll = 0
-
     for s in listSmsg:
         content = [s.serverName, s.newRole,s.ccu, s.roleLogin, s.newPayRole, s.newPay, s.newPayRate, s.newARPPU,
                    s.totalRolePay, s.totalPay,s.payPercent, s.arppu,s.ltv]
@@ -73,39 +61,6 @@ def writeExcelForGameInfo(path, title_title, listSmsg):
             sheet1.write(write_row, i, content[i], style)
         write_row = write_row + 1
 
-        allNewRole = allNewRole + int(s.newRole)
-        if not s.ccu == '-':
-            ccuAll = ccuAll + s.ccu
-        if not s.roleLogin == '-':
-            roleLoginALL = roleLoginALL + int(s.roleLogin)
-        if not s.newPayRole == '-':
-            newPayRole = newPayRole + int(s.newPayRole)
-        if not s.newPay == '-':
-            newIncome = newIncome + float(s.newPay)
-        if not s.newARPPU == '-':
-            newArppu = newArppu + float(s.newARPPU)
-        if not s.totalRolePay == '-':
-            allPayRole = allPayRole + float(s.totalRolePay)
-        if not s.totalPay == '-':
-            allIncome = allIncome + float(s.totalPay)
-        try:
-            if type(s.arppu) is types.StringType:
-                pass
-            else:
-                allArppu = allArppu + float(s.arppu)
-            if not s.ltv == '-':
-                allLTV = allLTV + float(s.ltv)
-            if not s.payPercent == '-':
-                payPercentAll = payPercentAll + float(s.payPercent)
-
-        except:
-            pass
-
-
-
-    huizong = [u'汇总', allNewRole,ccuAll, roleLoginALL, '-', '-', '-', '-', allPayRole, allIncome, '-', '-', '-']
-    for i in range(0, len(huizong)):
-        sheet1.write(write_row, i, huizong[i], style)
     excel.save(path)  # 保存文件
 
 

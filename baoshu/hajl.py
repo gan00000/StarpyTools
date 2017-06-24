@@ -1,4 +1,5 @@
 #-*- coding: UTF-8 -*-
+import os
 import sys
 import time
 import types
@@ -6,6 +7,7 @@ import simplejson as json
 import xlwt
 from bs4 import BeautifulSoup
 
+from baoshu.smsgtool import sumSmsg, doErrorMsg
 from excel.excelutil import *
 from time_helper import *
 from ServerMsg import *
@@ -16,6 +18,8 @@ from baoshu.Login2 import Login2
 
 reload(sys)
 sys.setdefaultencoding('utf8')
+
+
 def requestData():
     mLogin = Login()
     loginPage = 'http://jllrcsss-tw.starb168.com/gameManager/index.jsp'
@@ -26,7 +30,6 @@ def requestData():
     }
     headers = {
         'Referer': 'http://jllrcsss-tw.starb168.com/gameManager/index.jsp',
-        'Cookie': 'JSESSIONID=9EF250762D948835023FB51184352530',
         'Host': 'jllrcsss-tw.starb168.com',
         'Upgrade-Insecure-Requests': '1',
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36'
@@ -34,19 +37,25 @@ def requestData():
 
     # menupage,urllib2 = userlogin.login(loginPostUrl,postVaule,headers,'hajj_cookies')
 
-    login_success_page, login_session = mLogin.session_login(loginPage, loginPostUrl, postVaule, headers,'hajj_cookies')
+    login_success_page, login_session = mLogin.session_login(loginPage, loginPostUrl, postVaule, headers, 'hajj_cookies')
 
-    menupage = login_session.get('http://jllrcsss-tw.starb168.com/gameManager/menu.jsp',headers= headers)
+    menupage = login_session.get('http://jllrcsss-tw.starb168.com/gameManager/menu.jsp', headers=headers)
     # print menupage.text
     #每个接口都需要 带这个 头header才能访问通过（奇怪）
-    listSmsg = showDailyReport(login_session,headers)
+    listSmsg = showDailyReport(login_session, headers)
 
-    writeExcelForGameInfo('E:\\jingling\\hajl_baoshu.xls',u'精灵猎人 %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))),listSmsg)
+    listSmsg = sumSmsg(listSmsg)
+
+    writeExcelForGameInfo('E:\\jingling\\hajl_baoshu.xls',u'精灵王国 %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))),listSmsg)
+
+    errorLogFile = 'E:\jingling\errorMsg\hajl_errorLog.txt'
+    doErrorMsg(errorLogFile, listSmsg)
+    return listSmsg
 
 
 def showDailyReport(loginSession,headers):
     url = 'http://jllrcsss-tw.starb168.com/gameManager/view/pay/showDailyReport.jsp'
-    loginSession.get(url,headers = headers)
+    loginSession.get(url, headers=headers)
 
     serverIds = getServers(headers, loginSession)#获取所有伺服器id
     allServersCurrentDayMsg = []
@@ -61,7 +70,7 @@ def showDailyReport(loginSession,headers):
                 currentDaySmsg = currentDaySmsgArray[0]
                 allServersCurrentDayMsg.append(currentDaySmsg)
             else:
-                break
+                continue
 
             try:
                 allDayServerInfoArr = getServerMsg(headers, loginSession, sId, '2017-06-15 00:00:00')  # 获取该服所有天数信息
@@ -157,14 +166,19 @@ def getServerMsg(headers, loginSession,serverId,startTime):
     }
     s = loginSession.post(showDailyReportDo, data=values, headers=headers)
     # print s.text
-    parsed_json = json.loads(s.text)
+    try:
+        parsed_json = json.loads(s.text)
+    except:
+        print 'parsed_json = json.loads(s.text) error'
+        return None
     if parsed_json:
         serverArry = parsed_json.get('rows')
         if serverArry:
             sMsgArray = []
             for obj in serverArry:
                 platform = obj.get('platform')
-                if platform == '全平台':
+                # if platform == '全平台':
+                if platform == 'Starpy':
                     newID = obj.get('newID')  # 新增账号
                     liveID = obj.get('liveID')  # 活跃账号
                     payUser = obj.get('payUser')  # 付费用户
@@ -175,6 +189,7 @@ def getServerMsg(headers, loginSession,serverId,startTime):
                     payARPU = obj.get('payARPU')  # 付费arpu
 
                     sMsg = ServerMsg()
+                    sMsg.gameName = u'精灵王国'
                     sMsg.newRole = newID
                     sMsg.newARPPU = newARPU
                     sMsg.arppu = payARPU

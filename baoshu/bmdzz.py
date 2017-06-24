@@ -6,7 +6,9 @@ import types
 from bs4 import BeautifulSoup
 
 from baoshu.AccountLogin import Login
-from baoshu.bmdzz_info import bmdzzinfo
+# from baoshu.bmdzz_info import bmdzzinfo
+from baoshu.ServerMsg import ServerMsg
+from baoshu.smsgtool import sumSmsg, doErrorMsg
 from baoshu.time_helper import current_timestamp, get_current_time
 from excel.excelutil import *
 
@@ -54,7 +56,8 @@ def parseServerInfo(server):
             # print sibling
             td_list = server.find_all('td')
             if td_list:
-                bmdzzinfo_a = bmdzzinfo()
+                bmdzzinfo_a = ServerMsg()
+                bmdzzinfo_a.gameName = u'把妹大作战'
                 bmdzzinfo_a.data = td_list[0].string
                 bmdzzinfo_a.serverName = td_list[1].string
                 bmdzzinfo_a.newRole = td_list[2].string
@@ -126,40 +129,14 @@ def bmdzzbaoshu():
                                                              'bmdzz_cookies')
     # print login_success_page.text
     all_info = getNewServerData(login_session)
-    # print all_info
-    # title = '日期     ' + '区服     ' + '新增角色数   ' + '角色登录数   ' + '新增付费角色数    ' + '新增收入   ' + '新增付费比    ' + '新增ARPPU    ' + '全部付费角色数   ' + '全部收入   ' + 'ARPPU\n'
-    # for s in all_info:
-    #     if s.serverName is None or s.serverName.strip() == '狂人传说':
-    #         pass
-    #     else:
-    #         baoshu_info = '区服:%s  新增角色数:%s  角色登录数:%s  新增付费角色数:%s  新增收入:%s  新增付费比:%s  新增ARPPU:%s  全部付费角色数:%s  全部收入:%s  ARPPU:%s' % (
-    #             s.serverName, s.newRole, s.roleLogin, s.newPayRole, s.newPay, s.newPayRate, s.newARPPU, s.totalRolePay,
-    #             s.totalPay, s.arppu)
-    #
-    # baoshu_info = '把妹大作战数据:\n' + baoshu_info
-    # print baoshu_info
-    #
-    # #ltv
-    # all_server_info = getServerInfoFromData(login_session, '2017-05-18', get_current_time())
-    # if len(all_server_info) > 0:
-    #     ltv = 'LTV如下:\n'
-    #     for ss in all_server_info:
-    #         if ss.serverName is None or ss.serverName.strip() == '狂人传说':
-    #             pass
-    #         else:
-    #             if ss.totalPay and ss.newRole:
-    #
-    #                 ltv = ltv + '区服:%s LTV: %s' % (ss.serverName, str(round(float(ss.totalPay) / float(ss.newRole),2))) + '\n'
-    #
-    # print ltv
-    # baoshu_info = baoshu_info + '\n\n' + ltv
-    # print baoshu_info
+
     createXls(login_session,all_info)
     return ''
 
 def createXls(login_session, all_info):
     #ltv
     all_server_info = getServerInfoFromData(login_session, '2017-05-18', get_current_time())
+
     if len(all_server_info) > 0:
         for ss in all_server_info:
             if ss.serverName is None or ss.serverName.strip() == '狂人传说':
@@ -168,67 +145,76 @@ def createXls(login_session, all_info):
                 if ss.totalPay and ss.newRole:
                     print 'totalPay:' + ss.totalPay + '---newRole:' + ss.newRole
                     ss.ltv = str(round(float(ss.totalPay) / float(ss.newRole), 2))
-                    # ltv = ltv + '区服:%s LTV: %s' % (ss.serverName, str(round(float(ss.totalPay) / float(ss.newRole),2))) + '\n'
+                    for s in all_info:
+                        if s.serverName is None or s.serverName.strip() == '狂人传说':
+                            all_info.remove(s)
+                        elif ss.serverName == s.serverName:
+                            s.ltv = ss.ltv
 
+    all_info = sumSmsg(all_info)
+    title = u'把妹大作战 %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time())))
+    writeExcelForGameInfo('E:\\jingling\\bmdzz_baoshu.xls',title, all_info)
+    errorLogFile = 'E:\jingling\errorMsg\\bmdzz_errorLog.txt'
+    doErrorMsg(errorLogFile, all_info)
 
-    title = [u'区服',u'新增角色数',u'角色登录数',u'新增付费角色数',u'新增收入',u'新增付费比',u'新增ARPPU',u'全部付费角色数',u'全部收入',u'ARPPU',u'LTV']
-    excel = xlwt.Workbook()  # 创建工作簿
-    sheet1 = excel.add_sheet(u'sheet1', cell_overwrite_ok=True)  # 创建sheet
-
-    role_game_title = [u'把妹大作战 %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time())))]
-    sheet1.write_merge(0, 0, 0, 10)
-    write_row = 0
-    sheet1.write(write_row, 0, role_game_title, set_style('Times New Roman', 220, True))
-    write_row = write_row + 1
-
-    for i in range(0, len(title)):
-        sheet1.write(write_row, i, title[i], set_style('Times New Roman', 220, True))
-    write_row = write_row + 1
-    style = create_wrap_centre()
-
-
-    allNewRole = 0
-    roleLogin = 0
-    newPayRole = 0
-    newIncome = 0
-    newArppu = 0
-    allPayRole = 0
-    allIncome = 0
-    allArppu = 0
-
-    for s in all_info:
-        if s.serverName is None or s.serverName.strip() == '狂人传说':
-            pass
-        else:
-
-            allNewRole = allNewRole + int(s.newRole)
-            roleLogin = roleLogin + int(s.roleLogin)
-            newPayRole = newPayRole + int(s.newPayRole)
-            newIncome = newIncome + float(s.newPay)
-           # newArppu = newArppu + float(s.newARPPU)
-            allPayRole = allPayRole + float(s.totalRolePay)
-            allIncome = allIncome + float(s.totalPay)
-            try:
-                if type(s.arppu) is types.StringType:
-                    pass
-                else:
-                    allArppu = allArppu + float(s.arppu)
-            except:
-                pass
-            content = [s.serverName, s.newRole, s.roleLogin, s.newPayRole, s.newPay, s.newPayRate, s.newARPPU, s.totalRolePay, s.totalPay, s.arppu]
-
-            for ss in all_server_info:#拼接ltv
-                if ss.serverName == s.serverName:
-                    content.append(ss.ltv)
-
-            for i in range(0, len(content)):
-                sheet1.write(write_row, i, content[i], style)
-            write_row = write_row + 1
-
-    huizong = [u'汇总',allNewRole, roleLogin, newPayRole,newIncome,'-','-',allPayRole,allIncome,allArppu,'']
-    for i in range(0, len(huizong)):
-        sheet1.write(write_row, i,huizong[i] , style)
-    excel.save('E:\\jingling\\bmdzz_baoshu.xls')  # 保存文件
+    # title = [u'区服',u'新增角色数',u'角色登录数',u'新增付费角色数',u'新增收入',u'新增付费比',u'新增ARPPU',u'全部付费角色数',u'全部收入',u'ARPPU',u'LTV']
+    # excel = xlwt.Workbook()  # 创建工作簿
+    # sheet1 = excel.add_sheet(u'sheet1', cell_overwrite_ok=True)  # 创建sheet
+    #
+    # role_game_title = []
+    # sheet1.write_merge(0, 0, 0, 10)
+    # write_row = 0
+    # sheet1.write(write_row, 0, role_game_title, set_style('Times New Roman', 220, True))
+    # write_row = write_row + 1
+    #
+    # for i in range(0, len(title)):
+    #     sheet1.write(write_row, i, title[i], set_style('Times New Roman', 220, True))
+    # write_row = write_row + 1
+    # style = create_wrap_centre()
+    #
+    #
+    # allNewRole = 0
+    # roleLogin = 0
+    # newPayRole = 0
+    # newIncome = 0
+    # newArppu = 0
+    # allPayRole = 0
+    # allIncome = 0
+    # allArppu = 0
+    #
+    # for s in all_info:
+    #     if s.serverName is None or s.serverName.strip() == '狂人传说':
+    #         pass
+    #     else:
+    #
+    #         allNewRole = allNewRole + int(s.newRole)
+    #         roleLogin = roleLogin + int(s.roleLogin)
+    #         newPayRole = newPayRole + int(s.newPayRole)
+    #         newIncome = newIncome + float(s.newPay)
+    #        # newArppu = newArppu + float(s.newARPPU)
+    #         allPayRole = allPayRole + float(s.totalRolePay)
+    #         allIncome = allIncome + float(s.totalPay)
+    #         try:
+    #             if type(s.arppu) is types.StringType:
+    #                 pass
+    #             else:
+    #                 allArppu = allArppu + float(s.arppu)
+    #         except:
+    #             pass
+    #         content = [s.serverName, s.newRole, s.roleLogin, s.newPayRole, s.newPay, s.newPayRate, s.newARPPU, s.totalRolePay, s.totalPay, s.arppu]
+    #
+    #         for ss in all_server_info:#拼接ltv
+    #             if ss.serverName == s.serverName:
+    #                 content.append(ss.ltv)
+    #
+    #         for i in range(0, len(content)):
+    #             sheet1.write(write_row, i, content[i], style)
+    #         write_row = write_row + 1
+    #
+    # huizong = [u'汇总',allNewRole, roleLogin, newPayRole,newIncome,'-','-',allPayRole,allIncome,allArppu,'']
+    # for i in range(0, len(huizong)):
+    #     sheet1.write(write_row, i,huizong[i] , style)
+    # excel.save('E:\\jingling\\bmdzz_baoshu.xls')  # 保存文件
 
 if __name__ == '__main__':
 
