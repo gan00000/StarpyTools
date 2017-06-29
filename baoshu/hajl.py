@@ -21,25 +21,7 @@ sys.setdefaultencoding('utf8')
 
 
 def requestData():
-    mLogin = Login()
-    loginPage = 'http://jllrcsss-tw.starb168.com/gameManager/index.jsp'
-    loginPostUrl = 'http://jllrcsss-tw.starb168.com/gameManager/login.do'
-    postVaule = {
-        'username': 'csstarby3',
-        'password': '123456'
-    }
-    headers = {
-        'Referer': 'http://jllrcsss-tw.starb168.com/gameManager/index.jsp',
-        'Host': 'jllrcsss-tw.starb168.com',
-        'Upgrade-Insecure-Requests': '1',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36'
-    }
-
-    # menupage,urllib2 = userlogin.login(loginPostUrl,postVaule,headers,'hajj_cookies')
-
-    login_success_page, login_session = mLogin.session_login(loginPage, loginPostUrl, postVaule, headers, 'hajj_cookies')
-
-    menupage = login_session.get('http://jllrcsss-tw.starb168.com/gameManager/menu.jsp', headers=headers)
+    headers, login_session = loginAh()
     # print menupage.text
     #每个接口都需要 带这个 头header才能访问通过（奇怪）
     listSmsg = showDailyReport(login_session, headers)
@@ -51,6 +33,29 @@ def requestData():
     errorLogFile = 'E:\jingling\errorMsg\hajl_errorLog.txt'
     doErrorMsg(errorLogFile, listSmsg)
     return listSmsg
+
+
+def loginAh():
+    mLogin = Login()
+    loginPage = 'http://jllrcsss-tw.starb168.com/gameManager/index.jsp'
+    loginPostUrl = 'http://jllrcsss-tw.starb168.com/gameManager/login.do'
+    postVaule = {
+        # 'username': 'csstarby3',
+        # 'password': '123456'
+        'username': 'starpy001',
+        'password': 'star123456'
+    }
+    headers = {
+        'Referer': 'http://jllrcsss-tw.starb168.com/gameManager/index.jsp',
+        'Host': 'jllrcsss-tw.starb168.com',
+        'Upgrade-Insecure-Requests': '1',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36'
+    }
+    # menupage,urllib2 = userlogin.login(loginPostUrl,postVaule,headers,'hajj_cookies')
+    login_success_page, login_session = mLogin.session_login(loginPage, loginPostUrl, postVaule, headers,
+                                                             'hajj_cookies')
+    menupage = login_session.get('http://jllrcsss-tw.starb168.com/gameManager/menu.jsp', headers=headers)
+    return headers, login_session
 
 
 def showDailyReport(loginSession,headers):
@@ -96,7 +101,7 @@ def getPay(headers, loginSession, serverIds,startTime):
     values = {
         'nowPage': '1',
         'serverId': serverIds,
-        'gmpay': 1,
+        'gmpay': 2,
         'type': 1,
         'startTime': startTime,
         'endTime': get_current_time2(),
@@ -162,7 +167,7 @@ def getServerMsg(headers, loginSession,serverId,startTime):
         'serverId': serverId,
         'startTime': startTime,
         'endTime': get_current_time2(),
-        'gmpay': '1'
+        'gmpay': '2'
     }
     s = loginSession.post(showDailyReportDo, data=values, headers=headers)
     # print s.text
@@ -202,6 +207,40 @@ def getServerMsg(headers, loginSession,serverId,startTime):
 
             return sMsgArray
     return None
+
+#精灵发邮件
+def sendWupinByEmail(activitys_list):
+    if not activitys_list:
+        return
+    headers, login_session = loginAh()
+    login_session.get('http://jllrcsss-tw.starb168.com/gameManager/view/operationTools/sendEmail.jsp', headers=headers)
+
+    # serverIds = getServers(headers, login_session)  # 获取所有伺服器id
+    url = 'http://jllrcsss-tw.starb168.com/gameManager/sendEmail/sml.do'
+    for gifListItem in activitys_list:
+        gifts = gifListItem.giftList
+        if gifts and gifListItem.role_name:
+            for g in gifts:
+                values = {
+                    'userName': 'starpy001',
+                    'serverIds': gifListItem.sever_code,
+                    'operation': '玩家',
+                    'target': gifListItem.role_name,
+                    'emailTitle': gifListItem.mail_title,
+                    'emailContent': gifListItem.mail_content,
+                    'gold': '',
+                    'honour': '',
+                    'gem': '',
+                    'bindGem': '',
+                    'emailAttachment': g.gift_name + '*' + g.gift_count
+                }
+                try:
+                    postResult = login_session.post(url=url, data=values, headers=headers)
+                    print 'ok'
+                    print postResult.text
+                except Exception, e:
+                    print 'error message:', e.message
+                    print 'error'
 
 
 if __name__ == '__main__':
