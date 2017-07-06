@@ -43,7 +43,7 @@ class Login:
         # mainPage = session.get(loginPageUrl)
         # print mainPage.text
         #
-        # url = "http://47.89.21.166/master/duoluotaitanGM/index/login"
+        # url = "http://203.73.140.188/master/duoluotaitanGM/index/login"
         # values = {'username': 'tw001',
         #           'password': '123456',
         #           'submitid': '提交'}
@@ -52,8 +52,8 @@ class Login:
         #     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
         #     ,
         #     'Cookie': 'PHPSESSID=d7ivboe6vm67a8r0all3mrp5a3',
-        #     'Host': '47.89.21.166',
-        #     'Referer': 'http://47.89.21.166//master/duoluotaitanGM/index/login/?url=http://47.89.21.166/master/duoluotaitanGM/index'
+        #     'Host': '203.73.140.188',
+        #     'Referer': 'http://203.73.140.188//master/duoluotaitanGM/index/login/?url=http://203.73.140.188/master/duoluotaitanGM/index'
         # }
         # 不需要验证码直接登录成功
 

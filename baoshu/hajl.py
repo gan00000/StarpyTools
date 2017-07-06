@@ -40,10 +40,10 @@ def loginAh():
     loginPage = 'http://jllrcsss-tw.starb168.com/gameManager/index.jsp'
     loginPostUrl = 'http://jllrcsss-tw.starb168.com/gameManager/login.do'
     postVaule = {
-        # 'username': 'csstarby3',
-        # 'password': '123456'
-        'username': 'starpy001',
-        'password': 'star123456'
+        'username': 'csstarby3',
+        'password': '123456'
+        # 'username': 'starpy001',
+        # 'password': 'star123456'
     }
     headers = {
         'Referer': 'http://jllrcsss-tw.starb168.com/gameManager/index.jsp',

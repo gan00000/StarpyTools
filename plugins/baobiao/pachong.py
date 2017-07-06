@@ -45,10 +45,10 @@ def get_moth_before_time():
 
 def getServerInfo(session, serverId):
     # 选服
-    server_response = session.get("http://47.89.21.166/master/duoluotaitanGM/?area_selected_id=" + serverId)
+    server_response = session.get("http://203.73.140.188/master/duoluotaitanGM/?area_selected_id=" + serverId)
     # print server_response.text
     # 根据角色
-    data_role_url = "http://47.89.21.166/master/duoluotaitanGM/businessdata/businessmanagerrole"
+    data_role_url = "http://203.73.140.188/master/duoluotaitanGM/businessdata/businessmanagerrole"
     session.get(data_role_url)
 
     serverinfo = getCurrentDaySinfo(data_role_url, serverId, session)
@@ -63,8 +63,8 @@ def getServerInfo(session, serverId):
 def getMothDaySinfo(serverinfo,data_role_url, session):
     # 选择日期
     data_role_url_params = {'row[starttime]': get_moth_before_time()}
-    data_role_url_header = {'Referer': 'http://47.89.21.166/master/duoluotaitanGM/businessdata/businessmanagerrole',
-                            'Origin': 'http://47.89.21.166',
+    data_role_url_header = {'Referer': 'http://203.73.140.188/master/duoluotaitanGM/businessdata/businessmanagerrole',
+                            'Origin': 'http://203.73.140.188',
                             'Upgrade-Insecure-Requests': '1'}
     data_role_url_response = session.post(data_role_url, data=data_role_url_params, headers=data_role_url_header).text
     # print data_role_url_response.text
@@ -88,8 +88,8 @@ def getMothDaySinfo(serverinfo,data_role_url, session):
 def getCurrentDaySinfo(data_role_url, serverId, session):
     # 选择日期
     data_role_url_params = {'row[starttime]': get_current_time()}
-    data_role_url_header = {'Referer': 'http://47.89.21.166/master/duoluotaitanGM/businessdata/businessmanagerrole',
-                            'Origin': 'http://47.89.21.166',
+    data_role_url_header = {'Referer': 'http://203.73.140.188/master/duoluotaitanGM/businessdata/businessmanagerrole',
+                            'Origin': 'http://203.73.140.188',
                             'Upgrade-Insecure-Requests': '1'}
     data_role_url_response = session.post(data_role_url, data=data_role_url_params, headers=data_role_url_header).text
     # print data_role_url_response.text
@@ -117,8 +117,8 @@ def getCurrentDaySinfo(data_role_url, serverId, session):
 
 
 def realtime(session,all_config):
-    realtime_header = {'Referer':'http://47.89.21.166/master/duoluotaitanGM/index'}
-    session.get("http://47.89.21.166/master/duoluotaitanGM/area/realtime",headers=realtime_header)
+    realtime_header = {'Referer':'http://203.73.140.188/master/duoluotaitanGM/index'}
+    session.get("http://203.73.140.188/master/duoluotaitanGM/area/realtime",headers=realtime_header)
 
     realtime_params = {
         "page": "1",
@@ -133,7 +133,7 @@ def realtime(session,all_config):
     'aliasinfo':'id, name, currentonline, maxonline, registercount, updatetime, state'
     }
 
-    realtime_result = session.post("http://47.89.21.166/master/duoluotaitanGM/area/realtime/flexigrid?_=1493106566716",data= realtime_params)
+    realtime_result = session.post("http://203.73.140.188/master/duoluotaitanGM/area/realtime/flexigrid?_=1493106566716",data= realtime_params)
     # print realtime_result.text
 
     parsed_json = json.loads(realtime_result.text)
@@ -172,7 +172,7 @@ def set_all_config_online(all_config,onlinecfg):
             return
 
 
-# http://47.89.21.166/master/duoluotaitanGM/dbvip/payment/flexigrid?_=1493109987546
+# http://203.73.140.188/master/duoluotaitanGM/dbvip/payment/flexigrid?_=1493109987546
 # page:1
 # rp:20
 # sortname:create_time
@@ -188,8 +188,8 @@ def set_all_config_online(all_config,onlinecfg):
 
 def payment(session,all_config):
     print '充值订单详情'
-    _header = {'Referer': 'http://47.89.21.166/master/duoluotaitanGM/index'}
-    session.get("http://47.89.21.166/master/duoluotaitanGM/dbvip/payment",headers=_header)
+    _header = {'Referer': 'http://203.73.140.188/master/duoluotaitanGM/index'}
+    session.get("http://203.73.140.188/master/duoluotaitanGM/dbvip/payment",headers=_header)
     payment_params = {
     "page": "1",
     "rp": '5000',
@@ -207,7 +207,7 @@ def payment(session,all_config):
     # 'colsinfo': 'roleid,accountid,platform,channel,serverid,orderid,thirdorderid,money,create_time,finish_time,send_time,product_id,status,sending_time,id',
     # 'aliasinfo':'roleid,accountid,platform,channel,serverid,orderid,thirdorderid,money,create_time,finish_time,send_time,product_id,status,sending_time,id'
 
-    payment_result = session.post("http://47.89.21.166/master/duoluotaitanGM/dbvip/payment/flexigrid?_=1493111107475",data=payment_params,headers=_header)
+    payment_result = session.post("http://203.73.140.188/master/duoluotaitanGM/dbvip/payment/flexigrid?_=1493111107475",data=payment_params,headers=_header)
     print payment_result.text
     parsed_json = json.loads(payment_result.text)
     if parsed_json is not None:
@@ -223,8 +223,8 @@ def payment(session,all_config):
 
 def payment_ltv(session,all_config,serverid):
     print 'ltv : ' + serverid
-    _header = {'Referer': 'http://47.89.21.166/master/duoluotaitanGM/dbvip/payment'}
-    session.get("http://47.89.21.166/master/duoluotaitanGM/dbvip/payment",headers=_header)
+    _header = {'Referer': 'http://203.73.140.188/master/duoluotaitanGM/dbvip/payment'}
+    session.get("http://203.73.140.188/master/duoluotaitanGM/dbvip/payment",headers=_header)
 
     # page:1
     # rp:10000
@@ -253,7 +253,7 @@ def payment_ltv(session,all_config,serverid):
     # 'colsinfo': 'roleid,accountid,platform,channel,serverid,orderid,thirdorderid,money,create_time,finish_time,send_time,product_id,status,sending_time,id',
     # 'aliasinfo':'roleid,accountid,platform,channel,serverid,orderid,thirdorderid,money,create_time,finish_time,send_time,product_id,status,sending_time,id'
 
-    payment_result = session.post("http://47.89.21.166/master/duoluotaitanGM/dbvip/payment/flexigrid?_=1493264982973",data=payment_params,headers=_header)
+    payment_result = session.post("http://203.73.140.188/master/duoluotaitanGM/dbvip/payment/flexigrid?_=1493264982973",data=payment_params,headers=_header)
     # print "payment_result_ltv:" + payment_result.text
     parsed_json = json.loads(payment_result.text)
     if parsed_json is not None:
@@ -284,7 +284,7 @@ def sum_pay(all_config, json_cell, serverid):
 
 def getAllPay(session,all_config_temp):
     print '玩家充值数据'
-    url = 'http://47.89.21.166/master/duoluotaitanGM/businessdata/businesschargedata'
+    url = 'http://203.73.140.188/master/duoluotaitanGM/businessdata/businesschargedata'
     all_res = session.get(url).text
     # print all_res
 
@@ -306,13 +306,13 @@ def getAllPay(session,all_config_temp):
 
 def sendActivityWuPin(activity_list):
     from bs4 import BeautifulSoup
-    url='http://47.89.21.166/master/duoluotaitanGM/mail/singlemail'
-    send_header = {'Referer': 'http://47.89.21.166/master/duoluotaitanGM/'}
+    url='http://203.73.140.188/master/duoluotaitanGM/mail/singlemail'
+    send_header = {'Referer': 'http://203.73.140.188/master/duoluotaitanGM/'}
     login_page, m_seeion = session_login()
     sendres = m_seeion.get(url,headers=send_header)
 
-    add_page_header = {'Referer': 'http://47.89.21.166/master/duoluotaitanGM/mail/singlemail'}
-    add_page = m_seeion.get('http://47.89.21.166/master/duoluotaitanGM/mail/singlemail/add', headers=add_page_header)
+    add_page_header = {'Referer': 'http://203.73.140.188/master/duoluotaitanGM/mail/singlemail'}
+    add_page = m_seeion.get('http://203.73.140.188/master/duoluotaitanGM/mail/singlemail/add', headers=add_page_header)
     sendres_str = add_page.text
     print sendres_str
 
@@ -349,8 +349,8 @@ def sendActivityWuPin(activity_list):
                     'row[amount][]':g.gift_count,
                     'row[equiplevel][]':'0'
                     }
-                    activity_header = {'Referer': 'http://47.89.21.166/master/duoluotaitanGM/mail/singlemail/add','Host':'47.89.21.166','Origin':'http://47.89.21.166'}
-                    activity_res = m_seeion.post("http://47.89.21.166/master/duoluotaitanGM/mail/singlemail/add",data=send_activity_value,headers=activity_header)
+                    activity_header = {'Referer': 'http://203.73.140.188/master/duoluotaitanGM/mail/singlemail/add','Host':'203.73.140.188','Origin':'http://203.73.140.188'}
+                    activity_res = m_seeion.post("http://203.73.140.188/master/duoluotaitanGM/mail/singlemail/add",data=send_activity_value,headers=activity_header)
                     if activity_res is not None:
                         print "activity_res:" + activity_res.text
                         if '操作成功' in activity_res.text:
@@ -481,22 +481,26 @@ def session_login():
         session.cookies.load(ignore_discard=True)
     except:
         print("Cookie 未能加载")
-    url = "http://47.89.21.166/master/duoluotaitanGM/index/login"
-    url1 = "http://47.89.21.166//master/duoluotaitanGM/index/login/?url=http://47.89.21.166/master/duoluotaitanGM/index"
-    urllib2.urlopen(url1)
+    url = "http://203.73.140.188//master/duoluotaitanGM/index/login/"
+    url1 = "http://203.73.140.188//master/duoluotaitanGM/index/login/?url=http://203.73.140.188/master/duoluotaitanGM/index"
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
+        ,
+        # 'Cookie': 'PHPSESSID=d7ivboe6vm67a8r0all3mrp5a3',
+        'Host': '203.73.140.188',
+        'Referer': url1
+        }
+    session.get(url1, headers=headers)
+    # 不需要验证码直接登录成功
+
     values = {'username': 'tw001',
               'password': '123456',
               'submitid': '提交'}
     product_cookies(session)
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
-        ,
-        'Cookie': 'PHPSESSID=d7ivboe6vm67a8r0all3mrp5a3',
-        'Host': '47.89.21.166',
-        'Referer': 'http://47.89.21.166//master/duoluotaitanGM/index/login/?url=http://47.89.21.166/master/duoluotaitanGM/index'
-        }
-    # 不需要验证码直接登录成功
+
     login_page = session.post(url, data=values, headers=headers)
+
     session.cookies.save()
     return login_page, session
 
