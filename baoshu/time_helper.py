@@ -1,21 +1,21 @@
 #-*- coding: UTF-8 -*-
 
 import time
-from datetime import datetime
+import datetime
 
 def timestamp_to_strtime(timestamp):
     """将 13 位整数的毫秒时间戳转化成本地普通时间 (字符串格式)
     :param timestamp: 13 位整数的毫秒时间戳 (1456402864242)
     :return: 返回字符串格式 {str}'2016-02-25 20:21:04.242000'
     """
-    local_str_time = datetime.fromtimestamp(timestamp / 1000.0).strftime('%Y-%m-%d %H:%M:%S.%f')
+    local_str_time = datetime.datetime.fromtimestamp(timestamp / 1000.0).strftime('%Y-%m-%d %H:%M:%S.%f')
     return local_str_time
 def timestamp_to_datetime(timestamp):
     """将 13 位整数的毫秒时间戳转化成本地普通时间 (datetime 格式)
     :param timestamp: 13 位整数的毫秒时间戳 (1456402864242)
     :return: 返回 datetime 格式 {datetime}2016-02-25 20:21:04.242000
     """
-    local_dt_time = datetime.fromtimestamp(timestamp / 1000.0)
+    local_dt_time = datetime.datetime.fromtimestamp(timestamp / 1000.0)
     return local_dt_time
 def datetime_to_strtime(datetime_obj):
     """将 datetime 格式的时间 (含毫秒) 转为字符串格式
@@ -40,7 +40,7 @@ def strtime_to_datetime(timestr):
     :param timestr: {str}'2016-02-25 20:21:04.242'
     :return: {datetime}2016-02-25 20:21:04.242000
     """
-    local_datetime = datetime.strptime(timestr, "%Y-%m-%d %H:%M:%S.%f")
+    local_datetime = datetime.datetime.strptime(timestr, "%Y-%m-%d %H:%M:%S.%f")
     return local_datetime
 
 
@@ -59,7 +59,7 @@ def current_datetime():
     :return: (datetime 格式, 字符串格式, 时间戳格式)
     """
     # 当前时间：datetime 格式
-    local_datetime_now = datetime.now()
+    local_datetime_now = datetime.datetime.now()
     # 当前时间：字符串格式
     local_strtime_now = datetime_to_strtime(local_datetime_now)
     # 当前时间：时间戳格式 13位整数
@@ -67,7 +67,7 @@ def current_datetime():
     return local_datetime_now, local_strtime_now, local_timestamp_now
 
 def current_timestamp():
-    local_datetime_now = datetime.now()
+    local_datetime_now = datetime.datetime.now()
     local_timestamp_now = datetime_to_timestamp(local_datetime_now)
     return local_timestamp_now
 
@@ -80,6 +80,14 @@ def get_current_time2():
     # print time.time()
     t = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
     return t
+
+def get_tomorrow_time():
+    today = datetime.date.today()  # 获得今天的日期
+    print today   # 输出今天日期
+    tomorrow = today + datetime.timedelta(days=1)  # 用今天日期加上时间差，参数为1天，获得明天的日期
+    print tomorrow
+    return tomorrow
+
 
 if __name__ == '__main__':
 
@@ -100,3 +108,5 @@ if __name__ == '__main__':
     print 'current_time: ', current_time
     print 'local_strtime_now: ', local_strtime_now
     print 'local_timestamp_now: ', local_timestamp_now
+
+    get_tomorrow_time()

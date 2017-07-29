@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from baoshu import hajl
+from baoshu import hajl, ahdl_baoshu
+from plugins.baobiao import pachonggl
 from plugins.baobiao.pachong import *
 from apscheduler.schedulers.background import BlockingScheduler
 from baoshu.bmdzz import *
@@ -27,7 +28,19 @@ def myJob():
         hajl.requestData()
     except Exception, e:
         print 'error message:', e.message
+    try:
 
+        pachonggl.getGameDataInfoBeanGl()
+    except Exception, e:
+        print 'error message:', e.message
+
+    try:
+
+        ahdl_baoshu.getAhdlData()
+    except Exception, e:
+        print 'error message:', e.message
+
+    print '---------------------read data finish---------------------'
     path_m = 'E:\\pachongmsg.txt'
     if os.path.exists(path_m):
         f_f = open(path_m, 'w')
@@ -39,7 +52,7 @@ def myJob():
 if __name__ == '__main__':
 
     sched = BlockingScheduler()
-    sched.add_job(myJob, 'cron', hour='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23', minute='56')
+    sched.add_job(myJob, 'cron', hour='7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23', minute='56')
     # sched.add_job(myJob, 'interval', hours=1)
     # sched.add_job(myJob, 'interval', hours=1,start_date=0)
     try:

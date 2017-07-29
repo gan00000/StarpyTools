@@ -45,15 +45,15 @@ def get_moth_before_time():
 
 def getServerInfo(session, serverId):
     # 选服
-    server_response = session.get("http://203.73.140.188/master/duoluotaitanGM/?area_selected_id=" + serverId)
+    server_response = session.get("http://210.68.122.121/master/duoluotaitanGM/?area_selected_id=" + serverId)
     # print server_response.text
     # 根据角色
-    data_role_url = "http://203.73.140.188/master/duoluotaitanGM/businessdata/businessmanagerrole"
+    data_role_url = "http://210.68.122.121/master/duoluotaitanGM/businessdata/businessmanagerrole"
     session.get(data_role_url)
 
     serverinfo = getCurrentDaySinfo(data_role_url, serverId, session)
 
-    if int(serverId) > 22:
+    if int(serverId) > 0:
         getMothDaySinfo(serverinfo,data_role_url,session)
 
     print "sever_id:" + serverinfo.sever_id + "  register_roles:" + serverinfo.register_roles + " login_roles:" + serverinfo.login_roles
@@ -63,8 +63,8 @@ def getServerInfo(session, serverId):
 def getMothDaySinfo(serverinfo,data_role_url, session):
     # 选择日期
     data_role_url_params = {'row[starttime]': get_moth_before_time()}
-    data_role_url_header = {'Referer': 'http://203.73.140.188/master/duoluotaitanGM/businessdata/businessmanagerrole',
-                            'Origin': 'http://203.73.140.188',
+    data_role_url_header = {'Referer': 'http://210.68.122.121/master/duoluotaitanGM/businessdata/businessmanagerrole',
+                            'Origin': 'http://210.68.122.121',
                             'Upgrade-Insecure-Requests': '1'}
     data_role_url_response = session.post(data_role_url, data=data_role_url_params, headers=data_role_url_header).text
     # print data_role_url_response.text
@@ -88,8 +88,8 @@ def getMothDaySinfo(serverinfo,data_role_url, session):
 def getCurrentDaySinfo(data_role_url, serverId, session):
     # 选择日期
     data_role_url_params = {'row[starttime]': get_current_time()}
-    data_role_url_header = {'Referer': 'http://203.73.140.188/master/duoluotaitanGM/businessdata/businessmanagerrole',
-                            'Origin': 'http://203.73.140.188',
+    data_role_url_header = {'Referer': 'http://210.68.122.121/master/duoluotaitanGM/businessdata/businessmanagerrole',
+                            'Origin': 'http://210.68.122.121',
                             'Upgrade-Insecure-Requests': '1'}
     data_role_url_response = session.post(data_role_url, data=data_role_url_params, headers=data_role_url_header).text
     # print data_role_url_response.text
@@ -117,8 +117,8 @@ def getCurrentDaySinfo(data_role_url, serverId, session):
 
 
 def realtime(session,all_config):
-    realtime_header = {'Referer':'http://203.73.140.188/master/duoluotaitanGM/index'}
-    session.get("http://203.73.140.188/master/duoluotaitanGM/area/realtime",headers=realtime_header)
+    realtime_header = {'Referer':'http://210.68.122.121/master/duoluotaitanGM/index'}
+    session.get("http://210.68.122.121/master/duoluotaitanGM/area/realtime",headers=realtime_header)
 
     realtime_params = {
         "page": "1",
@@ -133,7 +133,7 @@ def realtime(session,all_config):
     'aliasinfo':'id, name, currentonline, maxonline, registercount, updatetime, state'
     }
 
-    realtime_result = session.post("http://203.73.140.188/master/duoluotaitanGM/area/realtime/flexigrid?_=1493106566716",data= realtime_params)
+    realtime_result = session.post("http://210.68.122.121/master/duoluotaitanGM/area/realtime/flexigrid?_=1493106566716",data= realtime_params)
     # print realtime_result.text
 
     parsed_json = json.loads(realtime_result.text)
@@ -172,7 +172,7 @@ def set_all_config_online(all_config,onlinecfg):
             return
 
 
-# http://203.73.140.188/master/duoluotaitanGM/dbvip/payment/flexigrid?_=1493109987546
+# http://210.68.122.121/master/duoluotaitanGM/dbvip/payment/flexigrid?_=1493109987546
 # page:1
 # rp:20
 # sortname:create_time
@@ -188,8 +188,8 @@ def set_all_config_online(all_config,onlinecfg):
 
 def payment(session,all_config):
     print '充值订单详情'
-    _header = {'Referer': 'http://203.73.140.188/master/duoluotaitanGM/index'}
-    session.get("http://203.73.140.188/master/duoluotaitanGM/dbvip/payment",headers=_header)
+    _header = {'Referer': 'http://210.68.122.121/master/duoluotaitanGM/index'}
+    session.get("http://210.68.122.121/master/duoluotaitanGM/dbvip/payment",headers=_header)
     payment_params = {
     "page": "1",
     "rp": '5000',
@@ -207,7 +207,7 @@ def payment(session,all_config):
     # 'colsinfo': 'roleid,accountid,platform,channel,serverid,orderid,thirdorderid,money,create_time,finish_time,send_time,product_id,status,sending_time,id',
     # 'aliasinfo':'roleid,accountid,platform,channel,serverid,orderid,thirdorderid,money,create_time,finish_time,send_time,product_id,status,sending_time,id'
 
-    payment_result = session.post("http://203.73.140.188/master/duoluotaitanGM/dbvip/payment/flexigrid?_=1493111107475",data=payment_params,headers=_header)
+    payment_result = session.post("http://210.68.122.121/master/duoluotaitanGM/dbvip/payment/flexigrid?_=1493111107475",data=payment_params,headers=_header)
     print payment_result.text
     parsed_json = json.loads(payment_result.text)
     if parsed_json is not None:
@@ -224,8 +224,8 @@ def payment(session,all_config):
 
 def payment_ltv(session,all_config,serverid):
     print 'ltv : ' + serverid
-    _header = {'Referer': 'http://203.73.140.188/master/duoluotaitanGM/dbvip/payment'}
-    session.get("http://203.73.140.188/master/duoluotaitanGM/dbvip/payment",headers=_header)
+    _header = {'Referer': 'http://210.68.122.121/master/duoluotaitanGM/dbvip/payment'}
+    session.get("http://210.68.122.121/master/duoluotaitanGM/dbvip/payment",headers=_header)
 
     # page:1
     # rp:10000
@@ -254,7 +254,7 @@ def payment_ltv(session,all_config,serverid):
     # 'colsinfo': 'roleid,accountid,platform,channel,serverid,orderid,thirdorderid,money,create_time,finish_time,send_time,product_id,status,sending_time,id',
     # 'aliasinfo':'roleid,accountid,platform,channel,serverid,orderid,thirdorderid,money,create_time,finish_time,send_time,product_id,status,sending_time,id'
 
-    payment_result = session.post("http://203.73.140.188/master/duoluotaitanGM/dbvip/payment/flexigrid?_=1493264982973",data=payment_params,headers=_header)
+    payment_result = session.post("http://210.68.122.121/master/duoluotaitanGM/dbvip/payment/flexigrid?_=1493264982973",data=payment_params,headers=_header)
     # print "payment_result_ltv:" + payment_result.text
     parsed_json = json.loads(payment_result.text)
     if parsed_json is not None:
@@ -285,11 +285,11 @@ def sum_pay(all_config, json_cell, serverid):
 
 def getAllPay(session,all_config_temp):
     print '玩家充值数据'
-    url = 'http://203.73.140.188/master/duoluotaitanGM/businessdata/businesschargedata'
+    url = 'http://210.68.122.121/master/duoluotaitanGM/businessdata/businesschargedata'
     all_res = session.get(url).text
     # print all_res
 
-    all_res_temp = all_res[all_res.index('<td>当日总流水</td>'):all_res.index('<form action="" method="POST" id="rowForm">')]
+    all_res_temp = all_res[all_res.index('<td>当日流水</td>'):all_res.index('<!-- <canvas id="cvs" width="1700" height="500" style="border:')]
 
     shuzi = re.compile("[\d.%]+")
     shuzi_g = shuzi.findall(all_res_temp)
@@ -297,23 +297,23 @@ def getAllPay(session,all_config_temp):
     for s in shuzi_g:
         print s
     all_config_temp.all_pay = shuzi_g[0]
-    all_config_temp.guanfang_pay = shuzi_g[1]
-    all_config_temp.others_pay = shuzi_g[2]
-    all_config_temp.pay_persions = shuzi_g[3]
-    all_config_temp.active_pay_rate = shuzi_g[4]
-    all_config_temp.new_pay_rate=shuzi_g[5]
-    all_config_temp.pay_arpu = shuzi_g[7]
+    # all_config_temp.guanfang_pay = shuzi_g[1]
+    # all_config_temp.others_pay = shuzi_g[2]
+    all_config_temp.pay_persions = shuzi_g[1]
+    all_config_temp.active_pay_rate = shuzi_g[2]
+    all_config_temp.new_pay_rate=shuzi_g[3]
+    all_config_temp.pay_arpu = shuzi_g[5]
 
 
 def sendActivityWuPin(activity_list):
     from bs4 import BeautifulSoup
-    url='http://203.73.140.188/master/duoluotaitanGM/mail/singlemail'
-    send_header = {'Referer': 'http://203.73.140.188/master/duoluotaitanGM/'}
+    url='http://210.68.122.121/master/duoluotaitanGM/mail/singlemail'
+    send_header = {'Referer': 'http://210.68.122.121/master/duoluotaitanGM/'}
     login_page, m_seeion = session_login()
     sendres = m_seeion.get(url,headers=send_header)
 
-    add_page_header = {'Referer': 'http://203.73.140.188/master/duoluotaitanGM/mail/singlemail'}
-    add_page = m_seeion.get('http://203.73.140.188/master/duoluotaitanGM/mail/singlemail/add', headers=add_page_header)
+    add_page_header = {'Referer': 'http://210.68.122.121/master/duoluotaitanGM/mail/singlemail'}
+    add_page = m_seeion.get('http://210.68.122.121/master/duoluotaitanGM/mail/singlemail/add', headers=add_page_header)
     sendres_str = add_page.text
     print sendres_str
 
@@ -350,8 +350,8 @@ def sendActivityWuPin(activity_list):
                     'row[amount][]':g.gift_count,
                     'row[equiplevel][]':'0'
                     }
-                    activity_header = {'Referer': 'http://203.73.140.188/master/duoluotaitanGM/mail/singlemail/add','Host':'203.73.140.188','Origin':'http://203.73.140.188'}
-                    activity_res = m_seeion.post("http://203.73.140.188/master/duoluotaitanGM/mail/singlemail/add",data=send_activity_value,headers=activity_header)
+                    activity_header = {'Referer': 'http://210.68.122.121/master/duoluotaitanGM/mail/singlemail/add','Host':'210.68.122.121','Origin':'http://210.68.122.121'}
+                    activity_res = m_seeion.post("http://210.68.122.121/master/duoluotaitanGM/mail/singlemail/add",data=send_activity_value,headers=activity_header)
                     if activity_res is not None:
                         print "activity_res:" + activity_res.text
                         if '操作成功' in activity_res.text:
@@ -477,25 +477,25 @@ def getGameAllInfo():
 def session_login():
     # 使用登录cookie信息
     session = requests.session()
-    session.cookies = cookielib.LWPCookieJar(filename='cookies')
+    session.cookies = cookielib.LWPCookieJar(filename='gl_cookies')
     try:
         session.cookies.load(ignore_discard=True)
     except:
         print("Cookie 未能加载")
-    url = "http://203.73.140.188//master/duoluotaitanGM/index/login/"
-    url1 = "http://203.73.140.188//master/duoluotaitanGM/index/login/?url=http://203.73.140.188/master/duoluotaitanGM/index"
+    url = "http://210.68.122.121//master/duoluotaitanGM/index/login/"
+    url1 = "http://210.68.122.121//master/duoluotaitanGM/index/login/?url=http://210.68.122.121/master/duoluotaitanGM/index"
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
         ,
         # 'Cookie': 'PHPSESSID=d7ivboe6vm67a8r0all3mrp5a3',
-        'Host': '203.73.140.188',
+        'Host': '210.68.122.121',
         'Referer': url1
         }
     session.get(url1, headers=headers)
     # 不需要验证码直接登录成功
 
-    values = {'username': 'tw001',
+    values = {'username': 'fl_op1',
               'password': '123456',
               'submitid': '提交'}
     product_cookies(session)
@@ -506,7 +506,7 @@ def session_login():
     return login_page, session
 
 
-def getGameDataInfoBean():
+def getGameDataInfoBeanGl():
 
     login_page, session = session_login()
 
@@ -552,7 +552,7 @@ def getGameDataInfoBean():
     total_register = 0
     # 生成第一行
 
-    role_game_title = [u'别惹萌萌哒 %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time())))]
+    role_game_title = [u'别惹萌萌哒英文版 %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time())))]
     sheet1.write_merge(0, 0, 0, 7)
     write_row = 0
     sheet1.write(write_row, 0, role_game_title,  set_style('Times New Roman', 220, True))
@@ -587,7 +587,7 @@ def getGameDataInfoBean():
         s_ltv = '\\'
 
         m = int(als.sever_id)
-        if m > 12:
+        if m > 0:
             payment_ltv(session, all_config, als.sever_id)
             # print 'ltv:' + str(s.ltv_pay)
             if als.ltv_pay > 0 and als.allRegister > 0:
@@ -606,7 +606,7 @@ def getGameDataInfoBean():
     #                     '       注册汇总:' + str(
     #     total_register) + "\nMYCARD:" + all_config.others_pay + "      储值汇总:" + all_config.all_pay + "      储值人数:" + all_config.pay_persions + '\n新增付费率:' + all_config.new_pay_rate + '       活跃付费率:' + all_config.active_pay_rate + '        ARPPU:' + all_config.pay_arpu
 
-    row_title_huizong = [u'汇总', str(total_dau), str(total_current_online), str(total_register), u"MYCARD:" + all_config.others_pay + '  ' + u"储值汇总:" + all_config.all_pay]
+    row_title_huizong = [u'汇总', str(total_dau), str(total_current_online), str(total_register), all_config.all_pay]
     aaa = [u'新增付费率:' + all_config.new_pay_rate, u'活跃付费率:' + all_config.active_pay_rate, u'ARPPU:' + all_config.pay_arpu]
 
     for i in range(0, len(row_title_huizong)):
@@ -615,10 +615,10 @@ def getGameDataInfoBean():
     for i in range(0, len(aaa)):
         sheet1.write(write_row, i, aaa[i], style)
     write_row = write_row + 1
-    f.save('E:\\jingling\\brmmd_baoshu.xls')  # 保存文件
+    f.save('E:\\jingling\\brmmd_gl_baoshu.xls')  # 保存文件
 
     return all_config
 
 
 if __name__ == '__main__':
-    getGameDataInfoBean()
+    getGameDataInfoBeanGl()

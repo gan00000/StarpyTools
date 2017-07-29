@@ -7,7 +7,7 @@ class ServerMsg:
         self.gameName = '' #游戏名字
         self.data = ''
         self.serverName = ''
-        self.newRole = '0'
+        self.newRole = '0' #新增用户数
         self.roleLogin = '-' #活跃用户DAU
         self.newPayRole = '-'
         self.newPay = '-'
@@ -17,7 +17,7 @@ class ServerMsg:
         self.payPercent = '-'
         self.ccu = '-' #在线用户
 
-        self.totalRolePay = '-' #当天所有付费角色
+        self.totalRolePay = '-' #当天所有付费角色数
         self.totalPay = '0'
 
         self.arppu = '-'

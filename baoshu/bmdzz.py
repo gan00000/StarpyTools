@@ -56,23 +56,31 @@ def parseServerInfo(server):
             # print sibling
             td_list = server.find_all('td')
             if td_list:
-                bmdzzinfo_a = ServerMsg()
-                bmdzzinfo_a.gameName = u'把妹大作战'
-                bmdzzinfo_a.data = td_list[0].string
-                bmdzzinfo_a.serverName = td_list[1].string
-                bmdzzinfo_a.newRole = td_list[2].string
-                bmdzzinfo_a.roleLogin = td_list[3].string
-                bmdzzinfo_a.newPayRole = td_list[4].string
-                bmdzzinfo_a.newPay = td_list[5].string
-                bmdzzinfo_a.newPayRate = td_list[6].string
-                bmdzzinfo_a.newARPPU = td_list[7].string
-                bmdzzinfo_a.totalRolePay = td_list[8].string
-                bmdzzinfo_a.totalPay = td_list[9].string
-                bmdzzinfo_a.arppu = td_list[10].string
-                # all_info.append(bmdzzinfo_a)
-                # for td_tag in td_list:
-                #     print td_tag.string
-                return bmdzzinfo_a
+                # bmdzzinfo_a = ServerMsg()
+                # bmdzzinfo_a.gameName = u'把妹大作战'
+                data = td_list[0].string
+                # if data:
+                if not data == '汇总':
+                    bmdzzinfo_a = ServerMsg()
+                    bmdzzinfo_a.gameName = u'把妹大作战'
+                    bmdzzinfo_a.data = td_list[0].string
+                    bmdzzinfo_a.serverName = td_list[1].string
+                    if not bmdzzinfo_a.serverName:
+                        bmdzzinfo_a.serverName = '...'
+                    bmdzzinfo_a.newRole = td_list[2].string
+                    bmdzzinfo_a.roleLogin = td_list[3].string
+                    bmdzzinfo_a.newPayRole = td_list[4].string
+                    bmdzzinfo_a.newPay = td_list[5].string
+                    bmdzzinfo_a.newPayRate = td_list[6].string
+                    bmdzzinfo_a.newARPPU = td_list[7].string
+                    bmdzzinfo_a.totalRolePay = td_list[8].string
+                    bmdzzinfo_a.totalPay = td_list[9].string
+                    bmdzzinfo_a.arppu = td_list[10].string
+                    # all_info.append(bmdzzinfo_a)
+                    # for td_tag in td_list:
+                    #     print td_tag.string
+                    return bmdzzinfo_a
+    return None
 
 
 def getServerInfoFromData(login_session, startDay, endDay):
@@ -139,14 +147,14 @@ def createXls(login_session, all_info):
 
     if len(all_server_info) > 0:
         for ss in all_server_info:
-            if ss.serverName is None or ss.serverName.strip() == '狂人传说':
+            if not ss or not ss.serverName or ss.serverName.strip() == '狂人传说':
                 pass
             else:
                 if ss.totalPay and ss.newRole:
                     print 'totalPay:' + ss.totalPay + '---newRole:' + ss.newRole
                     ss.ltv = str(round(float(ss.totalPay) / float(ss.newRole), 2))
                     for s in all_info:
-                        if s.serverName is None or s.serverName.strip() == '狂人传说':
+                        if not s or not s.serverName or s.serverName.strip() == '狂人传说':
                             all_info.remove(s)
                         elif ss.serverName == s.serverName:
                             s.ltv = ss.ltv
