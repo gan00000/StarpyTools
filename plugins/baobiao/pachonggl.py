@@ -547,9 +547,9 @@ def getGameDataInfoBeanGl():
     '''
     sheet1 = f.add_sheet(u'sheet1', cell_overwrite_ok=True)  # 创建sheet
 
-    total_dau = 0
+    total_dau = all_config.server_info_list[0].login_roles
     total_current_online = 0
-    total_register = 0
+    total_register =  all_config.server_info_list[0].register_roles
     # 生成第一行
 
     role_game_title = [u'别惹萌萌哒英文版 %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time())))]
@@ -567,27 +567,27 @@ def getGameDataInfoBeanGl():
     s_len = len(all_config.server_info_list)
     for j in range(s_len):
         als = all_config.server_info_list[j]
-        if als.login_roles == '':
-            pass
-        else:
-            total_dau = total_dau + int(als.login_roles)
+        # if als.login_roles == '':
+        #     pass
+        # else:
+        #     total_dau = total_dau + int(als.login_roles)
 
         if als.current_online == '':
             pass
         else:
             total_current_online = total_current_online + int(als.current_online)
 
-        if als.register_roles == '':
-            pass
-        else:
-            total_register = total_register + int(als.register_roles)
+        # if als.register_roles == '':
+        #     pass
+        # else:
+        #     total_register = total_register + int(als.register_roles)
 
-        s_total_pay = '\\'
-        s_total_register = '\\'
-        s_ltv = '\\'
+        s_total_pay = '-'
+        s_total_register = '-'
+        s_ltv = '-'
 
         m = int(als.sever_id)
-        if m > 0:
+        if m == 1:
             payment_ltv(session, all_config, als.sever_id)
             # print 'ltv:' + str(s.ltv_pay)
             if als.ltv_pay > 0 and als.allRegister > 0:
@@ -597,6 +597,11 @@ def getGameDataInfoBeanGl():
                 s_total_register = str(als.allRegister)
                 s_ltv = str(round(als.ltv_pay / als.allRegister, 2))
 
+        if m != 1:
+            als.login_roles = '-'
+            als.register_roles = '-'
+            als.s_total_register = '-'
+            als.s_ltv = '-'
         row0_info = [als.sever_id, als.login_roles, als.current_online, als.register_roles, str(als.pays), s_total_pay, s_total_register, s_ltv]
         for i in range(0, len(row0_info)):
             sheet1.write(write_row, i, row0_info[i], style)
