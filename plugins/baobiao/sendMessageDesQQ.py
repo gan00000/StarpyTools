@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from baoshu import hajl, ahdl_baoshu
+from baoshu import hajl, ahdl_baoshu, qmah_baoshu
 from plugins.baobiao import pachonggl
 from plugins.baobiao.pachong import *
 from apscheduler.schedulers.background import BlockingScheduler
@@ -40,6 +40,11 @@ def myJob():
     except Exception, e:
         print 'error message:', e.message
 
+    try:
+        qmah_baoshu.getAllDataQmah()
+    except Exception, e:
+        print 'error message:', e.message
+
     print '---------------------read data finish---------------------'
     path_m = 'E:\\pachongmsg.txt'
     if os.path.exists(path_m):
@@ -52,7 +57,7 @@ def myJob():
 if __name__ == '__main__':
 
     sched = BlockingScheduler()
-    sched.add_job(myJob, 'cron', hour='7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23', minute='50')
+    sched.add_job(myJob, 'cron', max_instances=10, hour='7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23', minute='50')
     # sched.add_job(myJob, 'interval', hours=1)
     # sched.add_job(myJob, 'interval', hours=1,start_date=0)
     try:

@@ -81,18 +81,19 @@ def getSMsgList(login_session, servers_map, channelId):
             soup_s_data = BeautifulSoup(pageText, 'html.parser')
             if soup_s_data:
                 tr_list = soup_s_data.find_all('tr')
+                sMsg = ServerMsg()
                 for tr in tr_list:
                     tds = tr.contents
                     if tds:
                         mSname = tds[3].string
                         if mSname == sName:
-                            sMsg = ServerMsg()
                             for td in tds:
                                 sMsg.data = tds[1].string
                                 sMsg.gameName = '暗黑边境'
                                 sMsg.serverName = mSname
                                 payment = float(tds[9].string)
 
+                                sMsg.totalPay = 0
                                 if payment > 0:
                                     payment = round(payment / 32, 2)
                                     sMsg.totalPay = payment
@@ -107,6 +108,7 @@ def getSMsgList(login_session, servers_map, channelId):
                                 # sMsg.payPercent = tds[19]
                                 print td.string
                             sMsg_lsit.append(sMsg)
+                            break
 
                 if channelId == '50100' and sMsg:
                     payment_1, newRole_1 = getSMsgLTVData(login_session,sId,'50100')
