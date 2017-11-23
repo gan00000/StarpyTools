@@ -18,7 +18,7 @@ class ServerMsg:
         self.ccu = '-' #在线用户
 
         self.totalRolePay = '-' #当天所有付费角色数
-        self.totalPay = '0'
+        self.totalPay = '0'#当天所有付费
 
         self.arppu = '-'
 
