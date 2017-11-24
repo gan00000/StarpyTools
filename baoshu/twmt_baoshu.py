@@ -57,7 +57,7 @@ def getServerRealTime(login_headers,login_session):
     }
 
     contentPage = login_session.post(postRealTimeUrl, data=postVaule, headers=login_headers)
-    print contentPage.text
+    # print contentPage.text
 
     soup_s_data = BeautifulSoup(contentPage.content, 'html.parser')
 
@@ -77,14 +77,22 @@ def getServerRealTime(login_headers,login_session):
     if tdlist:
         sMsg.newRole = tdlist[1].string
         sMsg.roleLogin = tdlist[2].string
-        sMsg.totalPay = tdlist[4].string
-        sMsg.newPayRole = tdlist[7].string
-        sMsg.totalRolePay = tdlist[10].string
 
-        sMsg.arppu = tdlist[12].string
+        sMsg.totalPay = 0
+        sMsg.totalPay = tdlist[4].string
+        if sMsg.totalPay > 0:
+            sMsg.totalPay = round(float(sMsg.totalPay) / 6.7, 2)
+
+        sMsg.newPayRole = tdlist[7].string
+
+        sMsg.totalRolePay = 0
+        sMsg.totalRolePay = int(tdlist[6].string)
+        if sMsg.totalRolePay > 0:
+            sMsg.arppu = round(sMsg.totalPay / sMsg.totalRolePay, 2)
+
         sMsg.payPercent = tdlist[11].string
-        sMsg.gameName = '魔塔Online'
-        sMsg.serverName = 'S1-隱秘之森'
+        sMsg.gameName = u'魔塔Online'
+        sMsg.serverName = u'S1-隱秘之森'
         # td_string = tdlist.string
         # print td_string
         return sMsg
@@ -194,11 +202,11 @@ def getServerPayData(login_session,sMsg,serverId):
             sMsg.newPay = td_lsit[12].string
 
 
-def getAllDataQmah():
+def getAllDataMTHX():
     headers, login_session = loginTWMT()
 
     sMsg_array = []
-    sMsg = getServerRealTime(headers,login_session)
+    sMsg = getServerRealTime(headers, login_session)
     if sMsg:
         sMsg_array.append(sMsg)
 
@@ -232,36 +240,7 @@ def getAllDataQmah():
     #
     if len(sMsg_array) > 0:
         listSmsg = sumSmsg(sMsg_array)
-        # writeExcelForGameInfo('E:\\jingling\\mthx_baoshu.xls', u'魔Online %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))), listSmsg)
-
-
-def getServer_ccu(login_session,sMsg ,serverId):
-    mValues = {
-        'serverid':serverId
-    }
-    result = login_session.post('http://sd.q5.com/index.php/main/sel_server', data=mValues)
-    result_info = login_session.get('http://sd.q5.com/index.php/functionlist/game_func/105')
-    # print result_info.content
-    ccu_html_data = BeautifulSoup(result_info.content, 'html.parser')
-    # print ccu_html_data.script
-    script_strings = ccu_html_data.find_all('script', text=re.compile(u"当日在线"))
-    for script in script_strings:
-        # if script.content:
-        ccu_info = script.text.strip()
-        ccu_info_array = ccu_info.split('\n')
-        for line in ccu_info_array:
-            line_q = line.strip()
-            if 'data: [' in line_q:
-                line_q_m = line_q.replace('[', '').replace('],', '')
-                print line_q_m
-                ccu_s_array = line_q_m.split(',')
-                ccu = ccu_s_array[-1]
-
-                print 'ccu:' + ccu
-                sMsg.ccu = int(ccu)
-                break
-
+        writeExcelForGameInfo('E:\\jingling\\mthx_baoshu.xls', u'魔塔Online %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))), listSmsg)
 
 if __name__ == '__main__':
-
-    getAllDataQmah()
+    getAllDataMTHX()

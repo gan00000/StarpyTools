@@ -98,7 +98,7 @@ def write_excel():
     #         sheet1.write(j + i + 1, 1, status[j])
     #     i += 4
     sheet1.write_merge(2, 2, 0, 7)
-    f.save('F:\\123saaa.xls')  # 保存文件
+    f.save('F:\\分割123saaa.xls')  # 保存文件
 
 
 if __name__ == '__main__':

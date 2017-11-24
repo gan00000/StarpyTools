@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from baoshu import hajl, ahdl_baoshu, qmah_baoshu
+from baoshu.twmt_baoshu import getAllDataMTHX
 from plugins.baobiao import pachonggl
 from plugins.baobiao.pachong import *
 from apscheduler.schedulers.background import BlockingScheduler
@@ -42,6 +43,11 @@ def myJob():
 
     try:
         qmah_baoshu.getAllDataQmah()
+    except Exception, e:
+        print 'error message:', e.message
+
+    try:
+        getAllDataMTHX()
     except Exception, e:
         print 'error message:', e.message
 
