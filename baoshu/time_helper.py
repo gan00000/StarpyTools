@@ -76,6 +76,11 @@ def get_current_time():
     t = time.strftime('%Y-%m-%d', time.localtime(time.time()))
     return t
 
+def get_current_time_2():
+    # print time.time()
+    t = time.strftime('%Y/%m/%d', time.localtime(time.time()))
+    return t
+
 def get_current_time2():
     # print time.time()
     t = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))

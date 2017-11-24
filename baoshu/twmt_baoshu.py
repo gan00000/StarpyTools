@@ -45,14 +45,37 @@ def loginTWMT():
 
     return headers, login_session
 
-def getServerRealTime(login_headers,login_session):
+def getServerList(login_headers,login_session):
+    realTimeUrl = 'http://mthxtw.gm.starpytw.com/Stat/realTime'
+
+    contentPage = login_session.get(realTimeUrl)
+
+    soup_s_data = BeautifulSoup(contentPage.content, 'html.parser')
+
+    servers_list = []
+
+    serverList = soup_s_data.find_all('select', attrs={"name": "server_id"})
+    if serverList and serverList[0]:
+        server_option_list = serverList[0].find_all('option')
+        if server_option_list:  # 遍列服务器 id 和 名称
+            for server_option in server_option_list:
+                serverMsg = ServerMsg()
+                print server_option['value']
+                print server_option.string
+                serverMsg.serverId = server_option['value']
+                serverMsg.serverName = server_option.string
+                servers_list.append(serverMsg)
+
+    return servers_list
+
+def getServerRealTime(login_headers,login_session, sMsg):
 
     today = time_helper.get_current_time()
     # http: // mthxtw.gm.starpytw.com / Stat / realTime
     postRealTimeUrl = 'http://mthxtw.gm.starpytw.com/Stat/realTime'
 
     postVaule = {
-        'server_id': '1001',
+        'server_id': sMsg.serverId,
         'platform_id': '1'
     }
 
@@ -61,22 +84,16 @@ def getServerRealTime(login_headers,login_session):
 
     soup_s_data = BeautifulSoup(contentPage.content, 'html.parser')
 
-    # serverList = soup_s_data.find_all('select', name_="server_id")
-    # if serverList[0]:
-    #     servers = serverList[0].find_all('option')
-    #     if servers:
-    #         for s in servers:
-    #             print s.string
 
     #  在这里我们想用 class 过滤，不过 class 是 python 的关键词，这怎么办？加个下划线就可以
     realTimeInfo = soup_s_data.tbody
 
     tdlist = realTimeInfo.find_all('td')
-    sMsg = ServerMsg()
 
     if tdlist:
         sMsg.newRole = tdlist[1].string
         sMsg.roleLogin = tdlist[2].string
+        sMsg.allDayReg = int(tdlist[3].string)
 
         sMsg.totalPay = 0
         sMsg.totalPay = tdlist[4].string
@@ -92,7 +109,7 @@ def getServerRealTime(login_headers,login_session):
 
         sMsg.payPercent = tdlist[11].string
         sMsg.gameName = u'魔塔Online'
-        sMsg.serverName = u'S1-隱秘之森'
+        # sMsg.serverName = u'S1-隱秘之森'
         # td_string = tdlist.string
         # print td_string
         return sMsg
@@ -101,114 +118,44 @@ def getServerRealTime(login_headers,login_session):
     # print realTimeInfo
     return None
 
-def getServerAllPay(login_session,sMsg,serverId):
+def getServerAllPay(login_headers,login_session, sMsg):
+
+
+    today = time_helper.get_current_time_2()
 
     mValues = {
-        'serverid': serverId
+        'server_id': sMsg.serverId,
+        'platform_id':'1',
+        'date_range':'2017/11/23 - ' + today
     }
-    result = login_session.post('http://sd.q5.com/index.php/main/sel_server', data=mValues)
+    result = login_session.post('http://mthxtw.gm.starpytw.com/Stat/basic', data=mValues, headers=login_headers)
 
-    today = time_helper.get_current_time()
-    startDay='2017-08-12'
-    url = 'http://sd.q5.com/index.php/functionlist/game_func/93?start=' + startDay + '&end=' + today + '&serverid=0&paytype=1'
-
-    contentPage = login_session.get(url)
-    soup_pay_data = BeautifulSoup(contentPage.content, 'html.parser')
+    soup_pay_data = BeautifulSoup(result.content, 'html.parser')
 
     #  在这里我们想用 class 过滤，不过 class 是 python 的关键词，这怎么办？加个下划线就可以
-    servers_pay_info_array = soup_pay_data.find_all('table', id='table_charta')
+    servers_pay_info_array = soup_pay_data.find_all('tr')
     if servers_pay_info_array:
-        pay_info = servers_pay_info_array[0]
-        trlist = pay_info.find_all('tr')
-        trlist.pop(0)
-        mTotalPay = 0
-        for tr in trlist:
-            if tr:
-                td_lsit = tr.find_all('td')
-                total_pay = td_lsit[4].string
-                if total_pay:
-                    mTotalPay = mTotalPay + round(float(total_pay)/100, 2)
+        pay_info = servers_pay_info_array[len(servers_pay_info_array) - 1]
+        tdlist = pay_info.find_all('td')
+        all_pay = tdlist[6].string
 
-        return mTotalPay
+        pays = round(float(all_pay) / 6.7, 2)  #历史储值（除了当天）
+        print pays
+        sMsg.allDayPay = pays + sMsg.totalPay  #总储值
+        sMsg.ltv = round(sMsg.allDayPay / sMsg.allDayReg, 2)
+        print sMsg.allDayPay
 
 
-def getServerAllReg(login_session,sMsg,serverId):
-    # http://sd.q5.com/index.php/functionlist/game_func/106
-
-    today = time_helper.get_current_time()
-    startDay = '2017-08-12'
-    url = 'http://sd.q5.com/index.php/functionlist/game_func/106?start=' + startDay + '&end=' + today + '&serverid=0'
-    contentPage = login_session.get(url)
-
-    soup_reg_data = BeautifulSoup(contentPage.content, 'html.parser')
-
-    #  在这里我们想用 class 过滤，不过 class 是 python 的关键词，这怎么办？加个下划线就可以
-    servers_reg_info_array = soup_reg_data.find_all('table', id='table_charta')
-    if servers_reg_info_array:
-        reg_info = servers_reg_info_array[0]
-        trlist = reg_info.find_all('tr')
-        trlist.pop(0)
-        mTotalReg = 0
-        for tr in trlist:
-            if tr:
-                td_lsit = tr.find_all('td')
-                total_reg = td_lsit[5].string
-                if total_reg:
-                    mTotalReg = mTotalReg + int(total_reg)
-        return mTotalReg
-
-
-
-def getServerPayData(login_session,sMsg,serverId):
-
-    mValues = {
-        'serverid': serverId
-    }
-    result = login_session.post('http://sd.q5.com/index.php/main/sel_server', data=mValues)
-
-    today = time_helper.get_current_time()
-    url = 'http://sd.q5.com/index.php/functionlist/game_func/93?start=' + today + '&end=' + today + '&serverid=0&paytype=1'
-
-    contentPage = login_session.get(url)
-    soup_pay_data = BeautifulSoup(contentPage.content, 'html.parser')
-
-    #  在这里我们想用 class 过滤，不过 class 是 python 的关键词，这怎么办？加个下划线就可以
-    servers_pay_info_array = soup_pay_data.find_all('table', id='table_charta')
-    if servers_pay_info_array:
-        pay_info = servers_pay_info_array[0]
-        trlist = pay_info.find_all('tr')
-        tr = trlist[1]
-        if tr:
-            td_lsit = tr.find_all('td')
-
-            sMsg.data = td_lsit[0].string
-            sMsg.roleLogin = td_lsit[1].string
-
-            sMsg.totalRolePay = 0
-            payRoleCount = td_lsit[2].string
-            if payRoleCount:
-                payRoleCount_int = int(payRoleCount)
-                sMsg.totalRolePay = payRoleCount_int
-            sMsg.totalPay = 0
-            total_pay = td_lsit[4].string
-            if total_pay:
-                sMsg.totalPay = round(float(total_pay)/100, 2)
-                if sMsg.totalRolePay >0:
-                    sMsg.arppu = round(sMsg.totalPay/sMsg.totalRolePay,2)
-            sMsg.payPercent = td_lsit[5].string
-
-            sMsg.newRole = td_lsit[10].string
-            sMsg.newPayRole = td_lsit[11].string
-            sMsg.newPay = td_lsit[12].string
 
 
 def getAllDataMTHX():
     headers, login_session = loginTWMT()
 
-    sMsg_array = []
-    sMsg = getServerRealTime(headers, login_session)
-    if sMsg:
-        sMsg_array.append(sMsg)
+    sMsg_array = getServerList(headers, login_session)
+    for sMsg in sMsg_array:
+        s = getServerRealTime(headers, login_session, sMsg)
+        getServerAllPay(headers, login_session, sMsg)
+
 
     # servers_map = getServerMap(headers,login_session)
     #
@@ -240,7 +187,7 @@ def getAllDataMTHX():
     #
     if len(sMsg_array) > 0:
         listSmsg = sumSmsg(sMsg_array)
-        writeExcelForGameInfo('E:\\jingling\\mthx_baoshu.xls', u'魔塔Online %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))), listSmsg)
+        # writeExcelForGameInfo('E:\\jingling\\mthx_baoshu.xls', u'魔塔Online %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))), listSmsg)
 
 if __name__ == '__main__':
     getAllDataMTHX()

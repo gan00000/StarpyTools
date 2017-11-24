@@ -7,6 +7,7 @@ class ServerMsg:
         self.gameName = '' #游戏名字
         self.data = ''
         self.serverName = ''
+        self.serverId = ''
         self.newRole = '0' #新增用户数
         self.roleLogin = '-' #活跃用户DAU
         self.newPayRole = '-'
@@ -23,5 +24,5 @@ class ServerMsg:
         self.arppu = '-'
 
         self.ltv = '-'
-        self.allDayReg = 0
-        self.allDayPay = 0
+        self.allDayReg = 0  #所有注册，用于计算ltv
+        self.allDayPay = 0 #所有储值，用于计算ltv
