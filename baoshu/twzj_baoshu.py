@@ -17,101 +17,121 @@ from baoshu.ServerMsg import ServerMsg
 from baoshu.AccountLogin import Login
 
 
-def loginTWMT():
+def loginTWZJ():
     mLogin = Login()
-    loginPage = 'http://mthxtw.gm.starpytw.com/Public/login'
-    loginPostUrl = 'http://mthxtw.gm.starpytw.com/Public/signin'
+    loginPage = 'http://sso.kaixin002.com'
+    loginPostUrl = 'http://sso.kaixin002.com/?mod=accounts&act=login'
     postVaule = {
-        'username': 'kefu',
-        'password': '123456'
+        'user_name': 'twxingbi',
+        'user_password': 'tw1234XBi',
+        'submit.x': '55',
+        'submit.y': '21'
     }
     headers = {
-        'Referer': 'http://mthxtw.gm.starpytw.com/Public/login',
-        'Host': 'mthxtw.gm.starpytw.com',
-        'Upgrade-Insecure-Requests': '1',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36'
+        'Referer': 'http://sso.kaixin002.com/?mod=accounts&act=login',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Host': 'sso.kaixin002.com',
     }
     # menupage,urllib2 = userlogin.login(loginPostUrl,postVaule,headers,'hajj_cookies')
-    login_success_page, login_session = mLogin.session_login(loginPage, loginPostUrl, postVaule, headers, 'mthx_cookies')
+    login_success_page, login_session = mLogin.session_login(loginPage, loginPostUrl, postVaule, headers, 'twzj_cookies')
 
-    postVauleMMM = {
-        'operator_id': '202'
-    }
-    login_session.post('http://mthxtw.gm.starpytw.com/Public/comfirmOperator',data=postVauleMMM)
-
-    mainPage = login_session.get('http://mthxtw.gm.starpytw.com/Index/index', headers=headers)
-
-    # print mainPage.text
+    main_page = login_session.get('http://sso.kaixin002.com/')
+    # print main_page.text
 
     return headers, login_session
-
+#http://sso2.kaixin002.com/fd/index.php?act=kx.total&aid=5672&lk=%B8%D6%CC%FA%D5%BD%D5%F9_%D7%DC%CC%E5%CA%FD%BE%DD&treeid=5672000
 def getServerList(login_headers,login_session):
-    realTimeUrl = 'http://mthxtw.gm.starpytw.com/Stat/realTime'
+    s_url = 'http://sso2.kaixin002.com/fd/index.php?act=kx.total&aid=5672&lk=%B8%D6%CC%FA%D5%BD%D5%F9_%D7%DC%CC%E5%CA%FD%BE%DD&treeid=5672000'
 
-    contentPage = login_session.get(realTimeUrl)
+    contentPage = login_session.get(s_url)
 
-    soup_s_data = BeautifulSoup(contentPage.content, 'html.parser')
+    soup_s_data = BeautifulSoup(contentPage.text, 'html.parser')
 
     servers_list = []
 
-    serverList = soup_s_data.find_all('select', attrs={"name": "server_id"})
+    serverList = soup_s_data.find_all('select')
     if serverList and serverList[0]:
         server_option_list = serverList[0].find_all('option')
+
         if server_option_list:  # 遍列服务器 id 和 名称
             for server_option in server_option_list:
+
+                s_value = server_option['value']
+                s_string = server_option.string
+                if u'全服汇总' == s_string:
+                    continue
+
+                if u'972' == s_value:
+                    continue
+
+                if u'973' == s_value:
+                    continue
+                print s_value
+                print s_string
                 serverMsg = ServerMsg()
-                print server_option['value']
-                print server_option.string
-                serverMsg.serverId = server_option['value']
-                serverMsg.serverName = server_option.string
+                serverMsg.serverId = s_value
+                serverMsg.serverName = s_string
                 servers_list.append(serverMsg)
 
     return servers_list
 
-def getServerRealTime(login_headers,login_session, sMsg):
+def getServerInfo(login_headers,login_session, sMsg):
 
     today = time_helper.get_current_time()
     # http: // mthxtw.gm.starpytw.com / Stat / realTime
-    postRealTimeUrl = 'http://mthxtw.gm.starpytw.com/Stat/realTime'
+    s_info_url = 'http://sso2.kaixin002.com/fd/index.php?sdate=' + today + '&edate=' + today + '&sid=' + sMsg.serverId + '&act=kx.total&treeid=5672000&day=&day2=day&aid=5672&lk=%B8%D6%CC%FA%D5%BD%D5%F9_%D7%DC%CC%E5%CA%FD%BE%DD&Submit=%B2%E9%D1%AF'
 
-    postVaule = {
-        'server_id': sMsg.serverId,
-        'platform_id': '1'
-    }
-
-    contentPage = login_session.post(postRealTimeUrl, data=postVaule, headers=login_headers)
+    contentPage = login_session.get(s_info_url , headers=login_headers)
     # print contentPage.text
 
-    soup_s_data = BeautifulSoup(contentPage.content, 'html.parser')
+    soup_s_data = BeautifulSoup(contentPage.text, 'html.parser')
 
 
     #  在这里我们想用 class 过滤，不过 class 是 python 的关键词，这怎么办？加个下划线就可以
-    realTimeInfo = soup_s_data.tbody
+    s_infos = soup_s_data.find_all('tr')
 
-    tdlist = realTimeInfo.find_all('td')
-
+    s_info_tr = s_infos[len(s_infos) -1]
+    tdlist = s_info_tr.find_all('td')
     if tdlist:
-        sMsg.newRole = tdlist[1].string
-        sMsg.roleLogin = tdlist[2].string
-        sMsg.allDayReg = int(tdlist[3].string)
+
+        newRole = tdlist[9].string
+        if newRole:
+            sMsg.newRole = newRole
+        else:
+            sMsg.newRole = 0
+        dau = tdlist[6].string
+        if dau:
+            sMsg.roleLogin = dau
+        else:
+            sMsg.roleLogin = 0
+        sMsg.allDayReg = 0
 
         sMsg.totalPay = 0
-        sMsg.totalPay = tdlist[4].string
-        if sMsg.totalPay > 0:
-            sMsg.totalPay = round(float(sMsg.totalPay) / 6.7, 2)
+        totalPay = tdlist[15].string
+        if totalPay:
+            sMsg.totalPay = totalPay
 
-        sMsg.newPayRole = tdlist[7].string
+        if sMsg.totalPay > 0:
+            sMsg.totalPay = round(float(sMsg.totalPay) / 32, 2)
+
+        newPayRole = tdlist[18].string
+        if newPayRole:
+            sMsg.newPayRole = newPayRole
+        else:
+            sMsg.newPayRole = 0
 
         sMsg.totalRolePay = 0
-        sMsg.totalRolePay = int(tdlist[6].string)
+        totalRolePay = tdlist[19].string
+        if totalRolePay:
+            sMsg.totalRolePay = int(totalRolePay)
+        else:
+            sMsg.totalRolePay = 0
         if sMsg.totalRolePay > 0:
             sMsg.arppu = round(sMsg.totalPay / sMsg.totalRolePay, 2)
 
-        sMsg.payPercent = tdlist[11].string
-        sMsg.gameName = u'魔塔Online'
-        # sMsg.serverName = u'S1-隱秘之森'
-        # td_string = tdlist.string
-        # print td_string
+        sMsg.payPercent = tdlist[20].string
+        sMsg.gameName = u'決戰金將軍'
+
         return sMsg
 
 
@@ -149,13 +169,13 @@ def getServerAllPay(login_headers,login_session, sMsg):
 
 
 
-def getAllDataMTHX():
-    headers, login_session = loginTWMT()
+def getAllDataTWZJ():
+    headers, login_session = loginTWZJ()
 
     sMsg_array = getServerList(headers, login_session)
     for sMsg in sMsg_array:
-        s = getServerRealTime(headers, login_session, sMsg)
-        getServerAllPay(headers, login_session, sMsg)
+        s = getServerInfo(headers, login_session, sMsg)
+        # getServerAllPay(headers, login_session, sMsg)
 
 
     # servers_map = getServerMap(headers,login_session)
@@ -188,7 +208,7 @@ def getAllDataMTHX():
     #
     if len(sMsg_array) > 0:
         listSmsg = sumSmsg(sMsg_array)
-        writeExcelForGameInfo('E:\\jingling\\mthx_baoshu.xls', u'魔塔Online %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))), listSmsg)
+        writeExcelForGameInfo('E:\\jingling\\twzj_baoshu.xls', u'決戰金將軍 %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))), listSmsg)
 
 if __name__ == '__main__':
-    getAllDataMTHX()
+    getAllDataTWZJ()

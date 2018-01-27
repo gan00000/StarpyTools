@@ -1,35 +1,37 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
 
-from baoshu import hajl, ahdl_baoshu, qmah_baoshu
+import logging
+
+from apscheduler.schedulers.background import BlockingScheduler
+
+from baoshu import hajl, ahdl_baoshu, twzj_baoshu
+from baoshu.bmdzz import *
 from baoshu.twmt_baoshu import getAllDataMTHX
 from plugins.baobiao import pachonggl
 from plugins.baobiao.pachong import *
-from apscheduler.schedulers.background import BlockingScheduler
-from baoshu.bmdzz import *
-import logging
+
 logging.basicConfig()
 
 
 def myJob():
 
     # for a in range(2):
-    try:
-        getGameDataInfoBean()
-    except Exception, e:
-        print 'error message:', e.message
+    # try:
+    #     getGameDataInfoBean()
+    # except Exception, e:
+    #     print 'error message:', e.message
 
     try:
         bmdzzbaoshu()
     except Exception, e:
         print 'error message:', e.message
 
-    try:
-
-        hajl.requestData()
-    except Exception, e:
-        print 'error message:', e.message
-    try:
+    # try:
+    #
+    #     hajl.requestData()
+    # except Exception, e:
+    #     print 'error message:', e.message
+    # try:
 
         pachonggl.getGameDataInfoBeanGl()
     except Exception, e:
@@ -41,13 +43,18 @@ def myJob():
     except Exception, e:
         print 'error message:', e.message
 
+    # try:
+    #     qmah_baoshu.getAllDataQmah()
+    # except Exception, e:
+    #     print 'error message:', e.message
+
     try:
-        qmah_baoshu.getAllDataQmah()
+        getAllDataMTHX()
     except Exception, e:
         print 'error message:', e.message
 
     try:
-        getAllDataMTHX()
+        twzj_baoshu.getAllDataTWZJ()
     except Exception, e:
         print 'error message:', e.message
 

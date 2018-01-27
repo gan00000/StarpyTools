@@ -39,8 +39,8 @@ class Login:
         except:
             print("Cookie 未能加载")
 
-        urllib2.urlopen(loginPageUrl)
-        # mainPage = session.get(loginPageUrl)
+        # urllib2.urlopen(loginPageUrl)
+        mainPage = session.get(loginPageUrl)
         # print mainPage.text
         #
         # url = "http://203.73.140.188/master/duoluotaitanGM/index/login"

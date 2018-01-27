@@ -20,7 +20,6 @@ def loginAhdl():
         'password': 'aliyououtSD_'
     }
     headers = {
-        'Referer': 'http://ahdltw-serlist.starb168.com:8188/longshuai/logout',
         'Host': 'ahdltw-serlist.starb168.com:8188',
         'Upgrade-Insecure-Requests': '1',
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36'
@@ -82,33 +81,36 @@ def getSMsgList(login_session, servers_map, channelId):
             if soup_s_data:
                 tr_list = soup_s_data.find_all('tr')
                 sMsg = ServerMsg()
-                for tr in tr_list:
-                    tds = tr.contents
-                    if tds:
-                        mSname = tds[3].string
-                        if mSname == sName:
-                            for td in tds:
-                                sMsg.data = tds[1].string
-                                sMsg.gameName = '暗黑边境'
-                                sMsg.serverName = mSname
-                                payment = float(tds[9].string)
 
-                                sMsg.totalPay = 0
-                                if payment > 0:
-                                    payment = round(payment / 32, 2)
-                                    sMsg.totalPay = payment
+                mTr = tr_list[len(tr_list) - 1]
+                tds = mTr.contents
+                if tds:
+                    mSname = tds[3].string
+                    if mSname == None:
+                        continue
+                    for td in tds:
+                        sMsg.data = tds[1].string
+                        sMsg.gameName = '暗黑边境'
+                        sMsg.serverName = mSname
+                        payment = float(tds[9].string)
 
-                                sMsg.totalRolePay = 0
-                                sMsg.roleLogin = 0
+                        sMsg.totalPay = 0
+                        if payment > 0:
+                            payment = round(payment / 32, 2)
+                            sMsg.totalPay = payment
 
-                                sMsg.roleLogin = int(tds[21].string)
-                                sMsg.newRole = int(tds[15].string)
-                                sMsg.totalRolePay = int(tds[7].string)
+                        sMsg.totalRolePay = 0
+                        sMsg.roleLogin = 0
 
-                                # sMsg.payPercent = tds[19]
-                                print td.string
-                            sMsg_lsit.append(sMsg)
-                            break
+                        sMsg.roleLogin = int(tds[21].string)
+                        sMsg.newRole = int(tds[15].string)
+                        sMsg.totalRolePay = int(tds[7].string)
+
+                        # sMsg.payPercent = tds[19]
+                        print td.string
+                    sMsg_lsit.append(sMsg)
+
+                # for tr in tr_list:
 
                 if channelId == '50100' and sMsg:
                     payment_1, newRole_1 = getSMsgLTVData(login_session,sId,'50100')
