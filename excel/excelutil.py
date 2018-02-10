@@ -63,6 +63,63 @@ def writeExcelForGameInfo(path, title_title, listSmsg):
 
     excel.save(path)  # 保存文件
 
+def writeExcelForGameInfo_new(path, title_title, listSmsg):
+
+    allTitle = [u'CCU', u'DAU', u'登入',u'付费人数', u'营收', u'付费率', u'ARPPU', u'LTV']
+    newTitle = [u'注册', u'创角', u'付费人数', u'营收', u'付费率', u'ARPPU']
+    dauTitle = [u'登入',u'付费人数', u'营收', u'付费率', u'ARPPU']
+    excel = xlwt.Workbook()  # 创建工作簿
+    sheet1 = excel.add_sheet(u'sheet1', cell_overwrite_ok=True)  # 创建sheet
+
+    style = create_wrap_centre()
+
+    sheet1.write_merge(0, 0, 0, len(allTitle) + len(newTitle) + len(dauTitle), title_title,style)
+    write_row = 0
+    write_row = write_row + 1
+
+    # style = set_style('Times New Roman', 220, True)
+    sheet1.write_merge(1, 2, 0, 0, u'区服',style)
+
+    sheet1.write_merge(write_row, write_row, 1, len(allTitle), u'总体', style)
+    sheet1.write_merge(write_row, write_row, len(allTitle) + 1, len(allTitle) + len(newTitle), label=u'新用户', style=style)
+    sheet1.write_merge(write_row, write_row, len(allTitle) + len(newTitle) + 1, len(allTitle) + len(newTitle) + len(dauTitle), label=u'新用户', style =style)
+    write_row = write_row + 1 
+
+    # set_style('Times New Roman', 220, True)
+    write_array(sheet1, allTitle, 2, 1, style)
+    write_array(sheet1, newTitle, 2, len(allTitle) + 1, style)
+    write_array(sheet1, dauTitle, 2, len(allTitle) + len(newTitle) + 1, style)
+    write_row = write_row + 1
+
+    for s in listSmsg:
+        content = [s.serverName, s.newRole, s.ccu, s.roleLogin, s.newPayRole, s.newPay, s.newPayRate, s.newARPPU,
+                   s.totalRolePay, s.totalPay, s.payPercent, s.arppu, s.ltv]
+        # for i in range(0, len(content)):
+        #     sheet1.write(write_row, i, content[i], style)
+
+        sheet1.write(write_row, 0, s.serverName, style)
+        sheet1.write(write_row, 1, s.ccu, style)
+        sheet1.write(write_row, 2, s.roleLogin, style)
+
+        sheet1.write(write_row, 9, s.newRole, style)#新增角色
+        sheet1.write(write_row, 11, s.newPayRole, style)#新增付费角色
+        sheet1.write(write_row, 12, s.newPay, style)#新增付费
+        sheet1.write(write_row, 13, s.newPayRate, style)#新增付费率
+
+        sheet1.write(write_row, 4, s.totalRolePay, style)#所有付费角色
+        sheet1.write(write_row, 5, s.totalPay, style)#当天所有付费
+        sheet1.write(write_row, 7, s.arppu, style)#总arppu
+        sheet1.write(write_row, 8, s.ltv, style)#ltv
+
+        write_row = write_row + 1
+
+    excel.save(path)  # 保存文件
+
+def write_array(sheet1, content_array, r, c, style):
+
+    for i in range(0, len(content_array)):
+        sheet1.write(r, c, content_array[i], style)
+        c = c + 1
 
 # 写excel
 def write_excel():
@@ -104,5 +161,6 @@ def write_excel():
 if __name__ == '__main__':
     # generate_workbook()
     # read_excel()
-    write_excel()
-    print u'创建demo.xlsx文件成功'
+    # write_excel()
+    writeExcelForGameInfo_new(u'/Users/gan/Desktop/test.xls',u'大家啊看',None)
+    print u'创建xlsx文件成功'

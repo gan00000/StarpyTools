@@ -7,7 +7,7 @@ import types
 from bs4 import BeautifulSoup
 
 from baoshu.smsgtool import sumSmsg
-from excel.excelutil import writeExcelForGameInfo
+from excel.excelutil import writeExcelForGameInfo, writeExcelForGameInfo_new
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -209,7 +209,7 @@ def getAllDataTWZJ():
     #
     if len(sMsg_array) > 0:
         listSmsg = sumSmsg(sMsg_array)
-        writeExcelForGameInfo('E:\\jingling\\twzj_baoshu.xls', u'決戰金將軍 %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))), listSmsg)
+        writeExcelForGameInfo_new('E:\\jingling\\twzj_baoshu.xls', u'決戰金將軍 %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))), listSmsg)
 
 if __name__ == '__main__':
     getAllDataTWZJ()
