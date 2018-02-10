@@ -8,3 +8,7 @@ plugins/baobiao/hajj_cookies
 plugins/baobiao/gl_cookies
 plugins/baobiao/ahdl_cookies
 *.pyc
+baoshu/gbzj_cookies
+plugins/baobiao/mthx_cookies
+plugins/baobiao/qmah_cookies
+plugins/baobiao/twzj_cookies

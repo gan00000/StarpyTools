@@ -46,10 +46,12 @@ def create_wrap_centre_C():
     style = xlwt.easyxf('align: wrap on,vert centre, horiz centre;pattern: pattern solid, fore_colour light_orange;')
     return style
 def create_wrap_centre_E():
-    style = xlwt.easyxf('align: wrap on,vert centre, horiz centre;pattern: pattern solid, fore_colour black; font: bold 0, color white;')
-    # font = xlwt.Font()  # 为样式创建字体
-    # font.color_index = 'white'
-    # style.font = font
+    style = xlwt.easyxf('align: wrap on,vert centre, horiz centre; pattern: pattern solid, fore_colour black;')
+    font = xlwt.Font()  # 为样式创建字体
+    font.colour_index = 1
+    font.bold = True
+    font.height = 20 * 16
+    style.font = font
     return style
 def create_wrap_centre_D():
     style = xlwt.easyxf('align: wrap on,vert centre, horiz centre;pattern: pattern solid, fore_colour dark_red;')

@@ -4,7 +4,7 @@ import logging
 
 from apscheduler.schedulers.background import BlockingScheduler
 
-from baoshu import hajl, ahdl_baoshu, twzj_baoshu
+from baoshu import hajl, ahdl_baoshu, twzj_baoshu, gbzj_baoshu
 from baoshu.bmdzz import *
 from baoshu.twmt_baoshu import getAllDataMTHX
 from plugins.baobiao import pachonggl
@@ -57,6 +57,11 @@ def myJob():
         twzj_baoshu.getAllDataTWZJ()
     except Exception, e:
         print 'error message:', e.message
+
+    # try:
+    #     gbzj_baoshu.getAllDataGBZJ()()
+    # except Exception, e:
+    #     print 'error message:', e.message
 
     print '---------------------read data finish---------------------'
     path_m = 'E:\\pachongmsg.txt'
