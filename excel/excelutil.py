@@ -36,6 +36,24 @@ def create_wrap_centre():
     style = xlwt.easyxf('align: wrap on,vert centre, horiz centre;')
     return style
 
+def create_wrap_centre_A():
+    style = xlwt.easyxf('align: wrap on,vert centre, horiz centre;pattern: pattern solid, fore_colour light_turquoise;')
+    return style
+def create_wrap_centre_B():
+    style = xlwt.easyxf('align: wrap on,vert centre, horiz centre;pattern: pattern solid, fore_colour light_green;')
+    return style
+def create_wrap_centre_C():
+    style = xlwt.easyxf('align: wrap on,vert centre, horiz centre;pattern: pattern solid, fore_colour light_orange;')
+    return style
+def create_wrap_centre_E():
+    style = xlwt.easyxf('align: wrap on,vert centre, horiz centre;pattern: pattern solid, fore_colour black; font: bold 0, color white;')
+    # font = xlwt.Font()  # 为样式创建字体
+    # font.color_index = 'white'
+    # style.font = font
+    return style
+def create_wrap_centre_D():
+    style = xlwt.easyxf('align: wrap on,vert centre, horiz centre;pattern: pattern solid, fore_colour dark_red;')
+    return style
 
 def writeExcelForGameInfo(path, title_title, listSmsg):
 
@@ -65,30 +83,33 @@ def writeExcelForGameInfo(path, title_title, listSmsg):
 
 def writeExcelForGameInfo_new(path, title_title, listSmsg):
 
-    allTitle = [u'CCU', u'DAU', u'登入',u'付费人数', u'营收', u'付费率', u'ARPPU', u'LTV']
-    newTitle = [u'注册', u'创角', u'付费人数', u'营收', u'付费率', u'ARPPU']
-    dauTitle = [u'登入',u'付费人数', u'营收', u'付费率', u'ARPPU']
+    allTitle = [u'CCU', u'DAU',u'付费人数', u'营收', u'付费率', u'ARPPU', u'LTV']
+    newTitle = [ u'新增用户', u'付费人数', u'营收', u'付费率', u'ARPPU']
+    dauTitle = [u'DAU',u'付费人数', u'营收', u'付费率', u'ARPPU']
     excel = xlwt.Workbook()  # 创建工作簿
     sheet1 = excel.add_sheet(u'sheet1', cell_overwrite_ok=True)  # 创建sheet
 
     style = create_wrap_centre()
 
-    sheet1.write_merge(0, 0, 0, len(allTitle) + len(newTitle) + len(dauTitle), title_title,style)
+    sheet1.write_merge(0, 0, 0, len(allTitle) + len(newTitle) + len(dauTitle), title_title,create_wrap_centre_E())
     write_row = 0
     write_row = write_row + 1
 
     # style = set_style('Times New Roman', 220, True)
-    sheet1.write_merge(1, 2, 0, 0, u'区服',style)
+    sheet1.write_merge(1, 2, 0, 0, u'区服',create_wrap_centre_D())
 
-    sheet1.write_merge(write_row, write_row, 1, len(allTitle), u'总体', style)
-    sheet1.write_merge(write_row, write_row, len(allTitle) + 1, len(allTitle) + len(newTitle), label=u'新用户', style=style)
-    sheet1.write_merge(write_row, write_row, len(allTitle) + len(newTitle) + 1, len(allTitle) + len(newTitle) + len(dauTitle), label=u'新用户', style =style)
+    style_a = create_wrap_centre_A()
+    style_b = create_wrap_centre_B()
+    style_c = create_wrap_centre_C()
+    sheet1.write_merge(write_row, write_row, 1, len(allTitle), u'总体',style_a)
+    sheet1.write_merge(write_row, write_row, len(allTitle) + 1, len(allTitle) + len(newTitle), label=u'新用户', style=style_b)
+    sheet1.write_merge(write_row, write_row, len(allTitle) + len(newTitle) + 1, len(allTitle) + len(newTitle) + len(dauTitle), label=u'活跃用户', style = style_c)
     write_row = write_row + 1 
 
     # set_style('Times New Roman', 220, True)
-    write_array(sheet1, allTitle, 2, 1, style)
-    write_array(sheet1, newTitle, 2, len(allTitle) + 1, style)
-    write_array(sheet1, dauTitle, 2, len(allTitle) + len(newTitle) + 1, style)
+    write_array(sheet1, allTitle, 2, 1, style_a)
+    write_array(sheet1, newTitle, 2, len(allTitle) + 1, style_b)
+    write_array(sheet1, dauTitle, 2, len(allTitle) + len(newTitle) + 1, style_c)
     write_row = write_row + 1
 
     for s in listSmsg:
@@ -98,18 +119,26 @@ def writeExcelForGameInfo_new(path, title_title, listSmsg):
         #     sheet1.write(write_row, i, content[i], style)
 
         sheet1.write(write_row, 0, s.serverName, style)
+
         sheet1.write(write_row, 1, s.ccu, style)
         sheet1.write(write_row, 2, s.roleLogin, style)
+        sheet1.write(write_row, 3, s.totalRolePay, style)#所有付费角色数
+        sheet1.write(write_row, 4, s.totalPay, style)#当天所有付费
+        sheet1.write(write_row, 5, s.payPercent, style)#当天付费率
+        sheet1.write(write_row, 6, s.arppu, style)#总arppu
+        sheet1.write(write_row, 7, s.ltv, style)#ltv
 
-        sheet1.write(write_row, 9, s.newRole, style)#新增角色
-        sheet1.write(write_row, 11, s.newPayRole, style)#新增付费角色
-        sheet1.write(write_row, 12, s.newPay, style)#新增付费
-        sheet1.write(write_row, 13, s.newPayRate, style)#新增付费率
-
-        sheet1.write(write_row, 4, s.totalRolePay, style)#所有付费角色
-        sheet1.write(write_row, 5, s.totalPay, style)#当天所有付费
-        sheet1.write(write_row, 7, s.arppu, style)#总arppu
-        sheet1.write(write_row, 8, s.ltv, style)#ltv
+        # m = len(allTitle)
+        sheet1.write(write_row, 8, s.newRole, style)#新增角色
+        sheet1.write(write_row, 9, s.newPayRole, style)#新增付费角色数
+        sheet1.write(write_row, 10, s.newPay, style)#新增付费
+        sheet1.write(write_row, 11, s.newPayRate, style)#新增付费率
+        if s.newPay and s.newPayRole:
+            try:
+                new_arppu = round(s.newPay / s.newPayRol,2)
+                sheet1.write(write_row, 11, new_arppu, style)  # 新增Arppu
+            except:
+                pass
 
         write_row = write_row + 1
 
