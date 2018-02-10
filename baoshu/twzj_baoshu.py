@@ -107,12 +107,13 @@ def getServerInfo(login_headers,login_session, sMsg):
         sMsg.allDayReg = 0
 
         sMsg.totalPay = 0
-        totalPay = tdlist[15].string
+        totalPay = tdlist[16].string
         if totalPay:
             sMsg.totalPay = totalPay
 
         if sMsg.totalPay > 0:
-            sMsg.totalPay = round(float(sMsg.totalPay) / 32, 2)
+            # sMsg.totalPay =float(sMsg.totalPay)
+            sMsg.totalPay = round(float(sMsg.totalPay) / 8, 2)
 
         newPayRole = tdlist[18].string
         if newPayRole:

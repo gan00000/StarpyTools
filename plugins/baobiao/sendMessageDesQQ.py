@@ -31,7 +31,7 @@ def myJob():
     #     hajl.requestData()
     # except Exception, e:
     #     print 'error message:', e.message
-    # try:
+    try:
 
         pachonggl.getGameDataInfoBeanGl()
     except Exception, e:
@@ -70,7 +70,7 @@ def myJob():
 if __name__ == '__main__':
 
     sched = BlockingScheduler()
-    sched.add_job(myJob, 'cron', max_instances=10, hour='7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23', minute='50')
+    sched.add_job(myJob, 'cron', max_instances=10, hour='7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23', minute='54')
     # sched.add_job(myJob, 'interval', hours=1)
     # sched.add_job(myJob, 'interval', hours=1,start_date=0)
     try:
