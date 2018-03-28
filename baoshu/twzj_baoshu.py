@@ -94,6 +94,7 @@ def getServerInfo(login_headers,login_session, sMsg):
     tdlist = s_info_tr.find_all('td')
     if tdlist:
 
+
         newRole = tdlist[9].string
         if newRole:
             sMsg.newRole = newRole
@@ -117,7 +118,7 @@ def getServerInfo(login_headers,login_session, sMsg):
 
         newPayRole = tdlist[18].string
         if newPayRole:
-            sMsg.newPayRole = newPayRole
+            sMsg.newPayRole = int(newPayRole)
         else:
             sMsg.newPayRole = 0
 
@@ -131,6 +132,8 @@ def getServerInfo(login_headers,login_session, sMsg):
             sMsg.arppu = round(sMsg.totalPay / sMsg.totalRolePay, 2)
 
         sMsg.payPercent = tdlist[20].string
+
+
         sMsg.gameName = u'決戰金將軍'
 
         return sMsg
@@ -167,6 +170,20 @@ def getServerAllPay(login_headers,login_session, sMsg):
             sMsg.ltv = round(sMsg.allDayPay / sMsg.allDayReg, 2)
         print sMsg.allDayPay
 
+def getServerCCU(login_headers,login_session, sMsg):
+    today = time_helper.get_current_time()
+    url = 'http://sso2.kaixin002.com/fd/index.php?sdate=' + today + '&edate=' + today + '&sid=' + sMsg.serverId + '&act=kx.serveronline&treeid=5672001&day=fiveminute&aid=5672&lk=%B8%D6%CC%FA%D5%BD%D5%F9_%D4%DA%CF%DF%CA%FD%BE%DD'
+    data = login_session.get(url, headers=login_headers)
+
+    ccu_s_data = BeautifulSoup(data.text, 'html.parser')
+    table_ccu = ccu_s_data.find_all(id="newtb")
+    tr_list = table_ccu[0].find_all('tr')
+    if tr_list:
+        td_list = tr_list[1].find_all('td')
+        if td_list:
+            ccu = td_list[2].string
+            print(sMsg.serverId + ' ccu is ' + ccu)
+            sMsg.ccu = int(ccu)
 
 
 
@@ -176,6 +193,7 @@ def getAllDataTWZJ():
     sMsg_array = getServerList(headers, login_session)
     for sMsg in sMsg_array:
         s = getServerInfo(headers, login_session, sMsg)
+        s = getServerCCU(headers, login_session, sMsg)
         # getServerAllPay(headers, login_session, sMsg)
 
 

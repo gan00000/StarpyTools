@@ -79,7 +79,8 @@ def getServerInfo(login_headers,login_session, sMsg):
 
     today = time_helper.get_current_time()
     # http: // mthxtw.gm.starpytw.com / Stat / realTime
-    s_info_url = 'http://sso2.kaixin002.com/fd/index.php?sdate=' + today + '&edate=' + today + '&sid=' + sMsg.serverId + '&act=kx.total&treeid=5682000&day=&day2=day&aid=5682&lk=General+Kim_%D7%DC%CC%E5%CA%FD%BE%DD&Submit=%B2%E9%D1%AF'
+    s_info_url = 'http://sso2.kaixin002.com/fd/index.php?sdate=' + today + '&edate=' + today + '&sid=' + sMsg.serverId \
+                 + '&act=kx.total&treeid=5682000&day=&day2=day&aid=5682&lk=General+Kim_%D7%DC%CC%E5%CA%FD%BE%DD&Submit=%B2%E9%D1%AF'
 
     contentPage = login_session.get(s_info_url , headers=login_headers)
     # print contentPage.text
@@ -107,17 +108,17 @@ def getServerInfo(login_headers,login_session, sMsg):
         sMsg.allDayReg = 0
 
         sMsg.totalPay = 0
-        totalPay = tdlist[16].string
+        totalPay = tdlist[15].string
         if totalPay:
             sMsg.totalPay = totalPay
 
         if sMsg.totalPay > 0:
-            # sMsg.totalPay =float(sMsg.totalPay)
-            sMsg.totalPay = round(float(sMsg.totalPay) / 8, 2)
+            sMsg.totalPay =float(sMsg.totalPay)
+            # sMsg.totalPay = round(float(sMsg.totalPay) / 8, 2)
 
         newPayRole = tdlist[18].string
         if newPayRole:
-            sMsg.newPayRole = newPayRole
+            sMsg.newPayRole = int(newPayRole)
         else:
             sMsg.newPayRole = 0
 
@@ -168,7 +169,20 @@ def getServerAllPay(login_headers,login_session, sMsg):
         print sMsg.allDayPay
 
 
+def getServerCCU(login_headers,login_session, sMsg):
+    today = time_helper.get_current_time()
+    url = 'http://sso2.kaixin002.com/fd/index.php?sdate=' + today + '&edate=' + today + '&sid=' + sMsg.serverId + '&act=kx.serveronline&treeid=5682001&day=fiveminute&aid=5682&lk=General+Kim_%D4%DA%CF%DF%CA%FD%BE%DD'
+    data = login_session.get(url, headers=login_headers)
 
+    ccu_s_data = BeautifulSoup(data.text, 'html.parser')
+    table_ccu = ccu_s_data.find_all(id="newtb")
+    tr_list = table_ccu[0].find_all('tr')
+    if tr_list:
+        td_list = tr_list[1].find_all('td')
+        if td_list:
+            ccu = td_list[2].string
+            print(sMsg.serverId + ' ccu is ' + ccu)
+            sMsg.ccu = int(ccu)
 
 def getAllDataGBZJ():
     headers, login_session = loginTWZJ()
@@ -176,6 +190,7 @@ def getAllDataGBZJ():
     sMsg_array = getServerList(headers, login_session)
     for sMsg in sMsg_array:
         s = getServerInfo(headers, login_session, sMsg)
+        s = getServerCCU(headers, login_session, sMsg)
         # getServerAllPay(headers, login_session, sMsg)
 
 

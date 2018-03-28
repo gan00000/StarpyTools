@@ -135,6 +135,16 @@ def writeExcelForGameInfo_new(path, title_title, listSmsg):
         sheet1.write(write_row, 9, s.newPayRole, style)#新增付费角色数
         sheet1.write(write_row, 10, s.newPay, style)#新增付费
         sheet1.write(write_row, 11, s.newPayRate, style)#新增付费率
+
+        sheet1.write(write_row, 13, s.roleLogin, style)  # 活跃付费率
+        if s.totalRolePay == '-' or s.newPayRole == '-':
+            pass
+        else:
+            sheet1.write(write_row, 14, s.totalRolePay - s.newPayRole, style)  # 活跃付费人数
+        sheet1.write(write_row, 15, s.totalPay , style)  # 活跃营收
+        # sheet1.write(write_row, 16, s.newPayRate, style)  # 活跃付费率
+        # sheet1.write(write_row, 17, s.newPayRate, style)  # 活跃arppu
+
         if s.newPay and s.newPayRole:
             try:
                 new_arppu = round(s.newPay / s.newPayRol,2)
