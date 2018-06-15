@@ -22,10 +22,10 @@ def myJob():
     # except Exception, e:
     #     print 'error message:', e.message
 
-    try:
-        bmdzzbaoshu()
-    except Exception, e:
-        print 'error message:', e.message
+    # try:
+    #     bmdzzbaoshu()
+    # except Exception, e:
+    #     print 'error message:', e.message
 
     # try:
     #
@@ -76,7 +76,7 @@ def myJob():
     t = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
     f_f.write(t)
     f_f.close()
-    
+
     print '---------------------write pachongmsg data finish---------------------'
 
 
