@@ -110,3 +110,50 @@ def readExcel(file_name,sheet):
                 activitybean_list.append(activitybean_info)
 
     return activitybean_list
+
+
+def readExcelToList(file_name,sheet):
+
+    if os.path.exists(file_name) is not True:
+        print 'excel不存在'
+        return
+
+    # 打开excel
+    data = xlrd.open_workbook(file_name,"rb")  # 注意这里的workbook首字母是小写
+    # 查看文件中包含sheet的名称
+    # data.sheet_names()
+    # 得到第一个工作表，或者通过索引顺序 或 工作表名称
+
+    row_list = []
+
+    table = data.sheets()[sheet]
+
+    # for table in tables:
+
+    # #获取行数和列数
+    nrows = table.nrows
+    ncols = table.ncols
+    print ncols
+    print nrows
+    # 循环行列表数据
+    # request必须配置
+
+    for i in range(nrows):
+        if i == 0:
+            pass
+        else:
+
+            cols_vals = []
+            for j in range(ncols):
+
+                cell_val = table.cell(i, j).value
+                if not cell_val:
+                    cell_val = ''
+
+                cols_vals.append(cell_val)
+
+
+
+            row_list.append(cols_vals)
+
+    return row_list

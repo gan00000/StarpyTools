@@ -19,14 +19,14 @@ from baoshu.AccountLogin import Login
 
 def loginTWMT():
     mLogin = Login()
-    loginPage = 'http://mthxtw.gm.starpytw.com:30345/Public/login'
-    loginPostUrl = 'http://mthxtw.gm.starpytw.com:30345/Public/signin'
+    loginPage = 'http://mthxtw.gm.starpytw.com/Public/login'
+    loginPostUrl = 'http://mthxtw.gm.starpytw.com/Public/signin'
     postVaule = {
-        'username': 'tangjiawei',
-        'password': 'PlayLotus1217'
+        'username': 'admin',
+        'password': 'xb123456'
     }
     headers = {
-        'Referer': 'http://mthxtw.gm.starpytw.com:30345/Public/login',
+        'Referer': 'http://mthxtw.gm.starpytw.com/Public/login',
         # 'Host': 'mthxtw.gm.starpytw.com',
         'Upgrade-Insecure-Requests': '1',
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36'
@@ -37,16 +37,16 @@ def loginTWMT():
     postVauleMMM = {
         'operator_id': '202'
     }
-    login_session.post('http://mthxtw.gm.starpytw.com:30345/Public/comfirmOperator',data=postVauleMMM)
+    login_session.post('http://mthxtw.gm.starpytw.com/Public/comfirmOperator',data=postVauleMMM)
 
-    mainPage = login_session.get('http://mthxtw.gm.starpytw.com:30345/Index/index', headers=headers)
+    mainPage = login_session.get('http://mthxtw.gm.starpytw.com/Index/index', headers=headers)
 
     # print mainPage.text
 
     return headers, login_session
 
 def getServerList(login_headers,login_session):
-    realTimeUrl = 'http://mthxtw.gm.starpytw.com:30345/Stat/realTime'
+    realTimeUrl = 'http://mthxtw.gm.starpytw.com/Stat/realTime'
 
     contentPage = login_session.get(realTimeUrl)
 
@@ -71,8 +71,8 @@ def getServerList(login_headers,login_session):
 def getServerRealTime(login_headers,login_session, sMsg):
 
     today = time_helper.get_current_time()
-    # http: // http://mthxtw.gm.starpytw.com:30345 / Stat / realTime
-    postRealTimeUrl = 'http://mthxtw.gm.starpytw.com:30345/Stat/realTime'
+    # http: // http://mthxtw.gm.starpytw.com / Stat / realTime
+    postRealTimeUrl = 'http://mthxtw.gm.starpytw.com/Stat/realTime'
 
     postVaule = {
         'server_id': sMsg.serverId,
@@ -128,7 +128,7 @@ def getServerAllPay(login_headers,login_session, sMsg):
         'platform_id':'1',
         'date_range':'2017/11/23 - ' + today
     }
-    result = login_session.post('http://mthxtw.gm.starpytw.com:30345/Stat/basic', data=mValues, headers=login_headers)
+    result = login_session.post('http://mthxtw.gm.starpytw.com/Stat/basic', data=mValues, headers=login_headers)
 
     soup_pay_data = BeautifulSoup(result.content, 'html.parser')
 
@@ -190,5 +190,101 @@ def getAllDataMTHX():
         listSmsg = sumSmsg(sMsg_array)
         writeExcelForGameInfo('E:\\jingling\\mthx_baoshu.xls', u'魔塔Online %s' % (time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))), listSmsg)
 
+
+def sendMsg():
+
+    from plugins.baobiao.activitymmd.excelutil import readExcelToList
+    result_list = readExcelToList(u'/Users/gan/Downloads/魔塔回档VIP经验补发2.xlsx',0)
+
+
+    headers, login_session = loginTWMT()
+
+    # form - radio: 1
+    # mail_select: 1
+    # uid: 4444
+    # lv:
+    # vip:
+    # gid:
+    # title: 昂达而过e
+    # contest:  啊嗯嗯
+    # sid[]: 1
+    # award: [{"Table": "static_currency", "Type": "3", "Id": "3", "Num": "800"}]
+
+
+    # sendStone(login_session, result_list)
+    add_vip_exp(login_session, result_list)
+
+
+def sendStone(login_session, result_list):
+    for l in result_list:
+
+        uid = l[2]
+        title = l[3]
+        contest = l[4]
+        sidName = l[0]
+        awardNum = l[1]
+
+        if sidName == 'S30':
+            sId = '33'
+        elif sidName == 'S25':
+            sId = '28'
+        else:
+            sId = ''
+
+        if sId == '':
+            break
+
+        award = '[{"Table": "static_currency", "Type": "3", "Id": "3", "Num": "%s"}]' % (int(awardNum))
+        print award
+        url = 'http://mthxtw.gm.starpytw.com/Operation/addMailExec'
+        postVaule = {
+            'form-radio': '1',
+            'mail_select': '1',
+            'uid': uid,
+            'lv': '',
+            'vip': '',
+            'gid': '',
+            'title': title,
+            'contest': contest,
+            'sid[]': sId,
+            'award': award,
+        }
+
+        print postVaule
+        login_session.post(url, data=postVaule)
+
+
+def add_vip_exp(login_session, result_list):
+    for l in result_list:
+
+        sidName = l[0]
+        vipadd = l[1]
+        uid = l[2]
+
+        if sidName == 'S30':
+            sId = '1030'
+        elif sidName == 'S25':
+            sId = '1025'
+        else:
+            sId = ''
+
+        if sId == '':
+            break
+
+        url = 'http://mthxtw.gm.starpytw.com/ServiceRun/vip'
+        postVaule = {
+            'vip_uid': uid,
+            'vipKey': 'add_vip_exp',
+            'vipVal': vipadd,
+            'operator_id': 'undefined',
+            'sid': sId,
+
+        }
+
+        print postVaule
+        login_session.post(url, data=postVaule)
+
+
 if __name__ == '__main__':
     getAllDataMTHX()
+    # sendMsg()
