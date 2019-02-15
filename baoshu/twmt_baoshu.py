@@ -23,7 +23,7 @@ def loginTWMT():
     loginPostUrl = 'http://mthxtw.gm.starpytw.com/Public/signin'
     postVaule = {
         'username': 'admin',
-        'password': 'xb123456'
+        'password': '123456'
     }
     headers = {
         'Referer': 'http://mthxtw.gm.starpytw.com/Public/login',
@@ -194,7 +194,7 @@ def getAllDataMTHX():
 def sendMsg():
 
     from plugins.baobiao.activitymmd.excelutil import readExcelToList
-    result_list = readExcelToList(u'/Users/gan/Downloads/魔塔回档VIP经验补发2.xlsx',0)
+    result_list = readExcelToList(u'/Users/gan/Downloads/1030发奖名单（钻石）.xlsx',0)
 
 
     headers, login_session = loginTWMT()
@@ -210,9 +210,9 @@ def sendMsg():
     # sid[]: 1
     # award: [{"Table": "static_currency", "Type": "3", "Id": "3", "Num": "800"}]
 
-
-    # sendStone(login_session, result_list)
-    add_vip_exp(login_session, result_list)
+    # print result_list
+    sendStone(login_session, result_list)
+    # add_vip_exp(login_session, result_list)
 
 
 def sendStone(login_session, result_list):
@@ -224,18 +224,47 @@ def sendStone(login_session, result_list):
         sidName = l[0]
         awardNum = l[1]
 
-        if sidName == 'S30':
-            sId = '33'
+        if sidName == 'S1':
+            sId = '1'
+        elif sidName == 'S5':
+            sId = '7'
+        elif sidName == 'S9':
+            sId = '11'
+        elif sidName == 'S13':
+            sId = '15'
+        elif sidName == 'S17':
+            sId = '20'
+        elif sidName == 'S21':
+            sId = '24'
         elif sidName == 'S25':
             sId = '28'
+        elif sidName == 'S26':
+            sId = '29'
+        elif sidName == 'S27':
+            sId = '30'
+        elif sidName == 'S28':
+            sId = '31'
+        elif sidName == 'S29':
+            sId = '32'
+        elif sidName == 'S30':
+            sId = '33'
         else:
-            sId = ''
+            sId = int(sidName)
 
         if sId == '':
             break
 
+        #仅发钻石
         award = '[{"Table": "static_currency", "Type": "3", "Id": "3", "Num": "%s"}]' % (int(awardNum))
-        print award
+        # award = '[{"Table":"static_box","Type":"1","Id":"270024","Num":"10"},{"Table":"static_box","Type":"1","Id":"270028","Num":"5"},{"Table":"static_box","Type":"1","Id":"270015","Num":"3"}]';
+        # award = '[{"Table":"static_currency","Type":"3","Id":"3","Num":"%s"}]' % (int(awardNum))
+        # award = '[{"Table":"static_box","Type":"1","Id":"270024","Num":"10"},{"Table":"static_box","Type":"1","Id":"270015","Num":"3"},{"Table":"static_prop","Type":"1","Id":"120017","Num":"15"}]'
+        # award = '[{"Table":"static_box","Type":"1","Id":"270039","Num":"5"},{"Table":"static_box","Type":"1","Id":"270035","Num":"3"},{"Table":"static_currency","Type":"4","Id":"4","Num":"500000"}]'
+
+        # award = '[{"Table":"static_box","Type":"1","Id":"270015","Num":"3"},{"Table":"static_patch","Type":"1","Id":"418006","Num":"20"},{"Table":"static_exclusive_patch","Type":"1","Id":"9818006","Num":"5"}]'
+
+        # award = '[{"Table":"static_box","Type":"1","Id":"270024","Num":"20"}]'
+        # print award
         url = 'http://mthxtw.gm.starpytw.com/Operation/addMailExec'
         postVaule = {
             'form-radio': '1',
@@ -253,6 +282,34 @@ def sendStone(login_session, result_list):
         print postVaule
         login_session.post(url, data=postVaule)
 
+
+def release_mail():
+
+    headers, login_session = loginTWMT()
+
+    for v in range(3302, 3439):
+        print v
+
+        mUrl = "http://mthxtw.gm.starpytw.com/Operation/release_mail?id=" + str(v)
+        print mUrl
+        login_session.get(mUrl)
+
+
+def mail_delete():
+
+    headers, login_session = loginTWMT()
+
+    for v in range(2027,2161):
+        print v
+
+        mUrl = "http://mthxtw.gm.starpytw.com/Operation/mail_delete?id=" + str(v)
+        print mUrl
+        postVaule = {
+            'id': str(v),
+        }
+
+        print postVaule
+        login_session.post(mUrl, data=postVaule)
 
 def add_vip_exp(login_session, result_list):
     for l in result_list:
@@ -286,5 +343,8 @@ def add_vip_exp(login_session, result_list):
 
 
 if __name__ == '__main__':
-    getAllDataMTHX()
+    # getAllDataMTHX()
     # sendMsg()
+    # release_mail()
+    # mail_delete()
+    pass
